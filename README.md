@@ -1,2 +1,1 @@
-# VinhKK_11_1
- (")> Quà tặng Vinh Ca ca
+An Android application for Diabete Retinopathy classification
