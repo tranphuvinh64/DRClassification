@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DRClassification</string>
+    <string name="btnImportImage">browse image</string>
+    <string name="btnClassify">Classify image</string>
+</resources>
