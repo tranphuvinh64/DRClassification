@@ -8,15 +8,6 @@ import android.os.Trace;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
-import org.tensorflow.lite.nnapi.NnApiDelegate;
-import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-
 import org.tensorflow.lite.support.common.FileUtil;
 import org.tensorflow.lite.support.common.TensorOperator;
 import org.tensorflow.lite.support.common.TensorProcessor;
@@ -30,6 +21,14 @@ import org.tensorflow.lite.support.image.ops.Rot90Op;
 import org.tensorflow.lite.support.label.TensorLabel;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
+import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+
 public class Classifier {
     private static final Logger LOGGER = new Logger();
     /** Number of results to show in the UI. */
@@ -38,6 +37,8 @@ public class Classifier {
     private MappedByteBuffer tfliteModel;
     /** Image size along the x axis. */
     private final int imageSizeX;
+
+
 
     /** Image size along the y axis. */
     private final int imageSizeY;
@@ -118,8 +119,6 @@ public class Classifier {
         probabilityProcessor = new TensorProcessor.Builder().add(getPostprocessNormalizeOp()).build();
 
         LOGGER.d("Created a Tensorflow Lite Image Classifier.");
-
-
 
     }
 
