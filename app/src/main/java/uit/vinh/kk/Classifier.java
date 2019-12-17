@@ -40,6 +40,12 @@ public class Classifier {
 
 
 
+
+
+
+
+
+
     /** Image size along the y axis. */
     private final int imageSizeY;
 
