@@ -15,8 +15,8 @@
 <!--                <category android:name="android.intent.category.LAUNCHER" />-->
 <!--            </intent-filter>-->
         </activity>
-        <activity android:name=".DisplayPatientInfoActivity"
-            android:label="Patient Information">
+        <activity android:name=".ResultActivity"
+            android:label="Result">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

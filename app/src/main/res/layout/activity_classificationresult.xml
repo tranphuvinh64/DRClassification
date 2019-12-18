@@ -1,32 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/imgImport"
-        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
-
-    <Button
-        android:id="@+id/btnClassify"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/btnClassify">
-    </Button>
-
-    <Button
-        android:id="@+id/btnImport"
-        android:layout_width="wrap_content"
-        android:text="@string/btnImportImage"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent" />
     <LinearLayout
         android:id="@+id/gesture_layout"
         android:layout_width="match_parent"
@@ -47,7 +29,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:text="level 0"/>
 
             <TextView
                 android:id="@+id/detected_item_value"
@@ -151,4 +134,14 @@
 
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+    <Button
+        android:id="@+id/buttonSaveData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Save"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
+
+
+</RelativeLayout>

@@ -1,11 +1,34 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="TextView.Secondary" parent="TextView">
+        <item name="android:textColor">@android:color/holo_orange_dark</item>
+    </style>
+
+    <style name="TextView.Label" parent="TextView">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextView.Label.Bold" parent="TextView.Label">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MaterialImageButton">
+        <item name="android:layout_width">40sp</item>
+        <item name="android:layout_height">40sp</item>
+        <item name="android:background">@android:color/transparent</item>
     </style>
 
 </resources>
