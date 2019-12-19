@@ -1,5 +1,6 @@
 package uit.vinh.kk;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,12 +35,17 @@ public class ResultActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case android.R.id.home:
-                onBackPressed();
+                backtoHomeScreen();
                 return true;
 
             default:break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void backtoHomeScreen(){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

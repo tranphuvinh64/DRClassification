@@ -1,30 +1,29 @@
 package uit.vinh.kk;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
-import android.util.Size;
-import android.util.TypedValue;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import uit.vinh.kk.Classifier.Recognition;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 import java.util.List;
+
+import uit.vinh.kk.Classifier.Recognition;
 //import org.tensorflow.lite.Interpreter;
 
 
@@ -39,6 +38,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             recognition2ValueTextView,
             recognition3ValueTextView,
             recognition4ValueTextView;
+    LinearLayout browseImageLinearLayout, infoLinearLayout, loadDataLinearLayout;
+    FloatingActionButton floatingActionButtonNew, floatingActionButtonBrowse, floatingActionButtonInfo, floatingActionButtonLoadData;
+    Animation fabOpen, fabClose, rotateBackward, rotateForward;
+    boolean isOpen = false;
     private static final int RC_CAMERA = 3000;
 
     private Button btnImport, btnClassify;
@@ -68,7 +71,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // initial components
         setContentView(R.layout.activity_main);
-        btnImport = findViewById(R.id.btnImport);
+
+
         btnClassify = findViewById(R.id.btnClassify);
         imgImport = findViewById(R.id.imgImport);
         recognitionTextView = findViewById(R.id.detected_item);
@@ -87,20 +91,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recognition3TextView.setText("Level 3");
         recognition4TextView.setText("Level 4");
 
+
+        browseImageLinearLayout = findViewById(R.id.browseimage_linear_layout);
+        infoLinearLayout = findViewById(R.id.info_linear_layout);
+        loadDataLinearLayout = findViewById(R.id.loaddata_linear_layout);
+
+        floatingActionButtonNew =findViewById(R.id.floating_action_button);
+        floatingActionButtonBrowse = findViewById(R.id.browseimage_floating_action_button);
+        floatingActionButtonInfo = findViewById(R.id.info_floating_action_button);
+        floatingActionButtonLoadData = findViewById(R.id.loaddata_floating_action_button);
+
         // set action listener
-        btnImport.setOnClickListener(this);
         btnClassify.setOnClickListener(this);
+        floatingActionButtonNew.setOnClickListener(this);
+        floatingActionButtonBrowse.setOnClickListener(this);
+        floatingActionButtonInfo.setOnClickListener(this);
+
+        fabOpen = AnimationUtils.loadAnimation(this,R.anim.fab_open);
+        fabClose = AnimationUtils.loadAnimation(this,R.anim.fab_close);
+        rotateBackward = AnimationUtils.loadAnimation(this,R.anim.rotate_backward);
+        rotateForward = AnimationUtils.loadAnimation(this,R.anim.rotate_forward);
+
+
     }
 
+    private void animateFAB(){
+        if(isOpen){
+            floatingActionButtonNew.startAnimation(rotateBackward);
+
+            browseImageLinearLayout.startAnimation(fabClose);
+            infoLinearLayout.startAnimation(fabClose);
+            loadDataLinearLayout.startAnimation(fabClose);
+
+            floatingActionButtonBrowse.setClickable(false);
+            floatingActionButtonInfo.setClickable(false);
+            floatingActionButtonLoadData.setClickable(false);
+            isOpen = false;
+        }
+        else
+        {
+            floatingActionButtonNew.startAnimation(rotateForward);
+
+            browseImageLinearLayout.startAnimation(fabOpen);
+            infoLinearLayout.startAnimation(fabOpen);
+            loadDataLinearLayout.startAnimation(fabOpen);
+
+            floatingActionButtonBrowse.setClickable(true);
+            floatingActionButtonInfo.setClickable(true);
+            floatingActionButtonLoadData.setClickable(true);
+            isOpen = true;
+        }
+    }
     @Override
     public void onClick(View v){
         if(v.getId() == R.id.btnClassify){
-            Log.d("debug", "vinh dep trai");
             processImage();
         }
-        else if(v.getId() == R.id.btnImport){
+        else if(v.getId() == R.id.browseimage_floating_action_button){
             ImagePicker.create(MainActivity.this).start();
         }
+        else if (v.getId() == R.id.info_floating_action_button){
+            Log.d("clicked", "onClick: info button Clicked");
+        }
+        else if (v.getId() == R.id.floating_action_button){
+            animateFAB();
+        }
+
     }
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
