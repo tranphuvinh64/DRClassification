@@ -18,7 +18,6 @@ public class ResultActivity extends AppCompatActivity {
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 //        Drawable drawable= getResources().getDrawable(android.R.drawable.ic_menu_search);
 //        getSupportActionBar().setHomeAsUpIndicator(drawable);
     }
@@ -26,7 +25,7 @@ public class ResultActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_back_menuitem, menu);
-        //getMenuInflater().inflate(R.menu.menu_search, menu);
+        //getMenuInflater().inflate(R.menu.menu_back_forward, menu);
         return true;
     }
 

@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/forward"
-        android:icon="@android:drawable/ic_search_category_default"
+        android:icon="@drawable/ic_arrow_forward"
         android:iconTint="@android:color/white"
         android:title="Menu 1"
         app:showAsAction="ifRoom" />

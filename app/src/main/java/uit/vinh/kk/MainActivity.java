@@ -20,7 +20,17 @@ import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import uit.vinh.kk.Classifier.Recognition;
@@ -28,6 +38,7 @@ import uit.vinh.kk.Classifier.Recognition;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private String TAG = "debug";
     protected TextView recognitionTextView,
             recognition1TextView,
             recognition2TextView,
@@ -106,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         floatingActionButtonNew.setOnClickListener(this);
         floatingActionButtonBrowse.setOnClickListener(this);
         floatingActionButtonInfo.setOnClickListener(this);
+        floatingActionButtonLoadData.setOnClickListener(this);
 
         fabOpen = AnimationUtils.loadAnimation(this,R.anim.fab_open);
         fabClose = AnimationUtils.loadAnimation(this,R.anim.fab_close);
@@ -156,7 +168,108 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else if (v.getId() == R.id.floating_action_button){
             animateFAB();
         }
+        else if (v.getId() == R.id.loaddata_floating_action_button){
+            Log.d(TAG, "onClick: load data");
+            loadXMLData("//storage//emulated//0//patientData");
+        }
 
+    }
+    private void loadXMLData(String pathFile){
+        ArrayList<String> userData = new ArrayList<String>();
+        FileInputStream fis = null;
+        try {
+            // fis = getApplicationContext().openFileInput(xmlpathFile);
+            fis = new FileInputStream(new File(pathFile));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        Log.d("debug", "Here 4");
+        InputStreamReader isr = new InputStreamReader(fis);
+        Log.d("debug", "Here 5");
+        char[] inputBuffer = new char[0];
+        try {
+            inputBuffer = new char[fis.available()];
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d("debug", "Here 6");
+        try {
+            isr.read(inputBuffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d("debug", "Here 7");
+        String data = new String(inputBuffer);
+        try {
+            isr.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        XmlPullParserFactory factory = null;
+        try {
+            factory = XmlPullParserFactory.newInstance();
+        }
+        catch (XmlPullParserException e2) {
+            // TODO Auto-generated catch block
+            e2.printStackTrace();
+        }
+        factory.setNamespaceAware(true);
+        XmlPullParser xpp = null;
+        try {
+            xpp = factory.newPullParser();
+        }
+        catch (XmlPullParserException e2) {
+            // TODO Auto-generated catch block
+            e2.printStackTrace();
+        }
+        try {
+            xpp.setInput(new StringReader(data));
+        }
+        catch (XmlPullParserException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        int eventType = 0;
+        try {
+            eventType = xpp.getEventType();
+        }
+        catch (XmlPullParserException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        while (eventType != XmlPullParser.END_DOCUMENT){
+            if (eventType == XmlPullParser.START_DOCUMENT) {
+                System.out.println("Start document");
+            }
+            else if (eventType == XmlPullParser.START_TAG) {
+                System.out.println("Start tag "+xpp.getName());
+            }
+            else if (eventType == XmlPullParser.END_TAG) {
+                System.out.println("End tag "+xpp.getName());
+            }
+            else if(eventType == XmlPullParser.TEXT) {
+                userData.add(xpp.getText());
+            }
+            try {
+                eventType = xpp.next();
+            }
+            catch (XmlPullParserException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        String userName = userData.get(0);
+        String password = userData.get(1);
+
+        Log.d("read file result", userName);
+        Log.d("read file result", password);
     }
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
@@ -176,7 +289,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
 
     protected void processImage() {
         // rgbFrameBitmap.setPixels(getRgbBytes(), 0, previewWidth, 0, 0, previewWidth, previewHeight);
