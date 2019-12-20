@@ -176,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     private void loadXMLData(String pathFile){
         ArrayList<String> userData = new ArrayList<String>();
+        ArrayList<Form> listForm = new ArrayList<Form>();
         FileInputStream fis = null;
         try {
             // fis = getApplicationContext().openFileInput(xmlpathFile);
@@ -183,22 +184,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        Log.d("debug", "Here 4");
         InputStreamReader isr = new InputStreamReader(fis);
-        Log.d("debug", "Here 5");
+
         char[] inputBuffer = new char[0];
         try {
             inputBuffer = new char[fis.available()];
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.d("debug", "Here 6");
+
         try {
             isr.read(inputBuffer);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.d("debug", "Here 7");
         String data = new String(inputBuffer);
         try {
             isr.close();
@@ -232,6 +231,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+
+
         int eventType = 0;
         try {
             eventType = xpp.getEventType();
@@ -240,36 +241,101 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+
+
+        Form newForm = null;
         while (eventType != XmlPullParser.END_DOCUMENT){
-            if (eventType == XmlPullParser.START_DOCUMENT) {
-                System.out.println("Start document");
+            if (xpp.getName() != null && xpp.getName().equals("patient")){
+                Log.d(TAG, "here 1");
+                if(eventType == XmlPullParser.START_TAG){
+                    newForm = new Form();
+                }
+                else if (eventType == XmlPullParser.END_TAG){
+                    listForm.add(newForm);
+                    newForm = null;
+                }
             }
-            else if (eventType == XmlPullParser.START_TAG) {
-                System.out.println("Start tag "+xpp.getName());
-            }
-            else if (eventType == XmlPullParser.END_TAG) {
-                System.out.println("End tag "+xpp.getName());
-            }
-            else if(eventType == XmlPullParser.TEXT) {
-                userData.add(xpp.getText());
+
+            else if(eventType == XmlPullParser.START_TAG)
+            {
+                String tagName = xpp.getName();
+                Log.d(TAG, "tagName==" + tagName);
+                try {
+                    eventType = xpp.next();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (XmlPullParserException e) {
+                    e.printStackTrace();
+                }
+                if(eventType == XmlPullParser.TEXT){
+                    switch (tagName){
+                        case "ID":
+                            Log.d(TAG, xpp.getText());
+                            newForm.setID(xpp.getText());
+                            break;
+                        case "Name":
+                            Log.d(TAG, xpp.getText());
+                            newForm.setName(xpp.getText());
+                            break;
+                    }
+
+                }
             }
             try {
                 eventType = xpp.next();
-            }
-            catch (XmlPullParserException e) {
-                // TODO Auto-generated catch block
+            } catch (IOException e) {
                 e.printStackTrace();
-            }
-            catch (IOException e) {
-                // TODO Auto-generated catch block
+            } catch (XmlPullParserException e) {
                 e.printStackTrace();
             }
         }
-        String userName = userData.get(0);
-        String password = userData.get(1);
 
-        Log.d("read file result", userName);
-        Log.d("read file result", password);
+        for(int i = 0; i < listForm.size(); i++){
+            Log.d(TAG, i + " loadXMLData: " + listForm.get(i).toString());
+        }
+
+        return;
+
+
+
+//        while (eventType != XmlPullParser.END_DOCUMENT){
+//            if (eventType == XmlPullParser.START_DOCUMENT) {
+//                System.out.println("Start document");
+//
+//            }
+//            else if (eventType == XmlPullParser.START_TAG) {
+//                System.out.println("Start tag "+xpp.getName());
+//            }
+//            else if (eventType == XmlPullParser.END_TAG) {
+//                System.out.println("End tag "+xpp.getName());
+//            }
+//            else if(eventType == XmlPullParser.TEXT) {
+//                userData.add(xpp.getText());
+//            }
+//            try {
+//                eventType = xpp.next();
+//            }
+//            catch (XmlPullParserException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//            catch (IOException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//        }
+//        for(int i = 0; i< userData.size();i++){
+//            Log.d(TAG, userData.get(i));
+//        }
+//        String userName = userData.get(0);
+//        String password = userData.get(1);
+//
+//        Log.d("read file result", userName);
+//        Log.d("read file result", password);
+
+
+
+
     }
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {

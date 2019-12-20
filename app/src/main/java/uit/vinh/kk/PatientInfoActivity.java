@@ -25,7 +25,7 @@ public class PatientInfoActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_patientinfo);
+        setContentView(R.layout.activity_savepatientinfo);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         saveButton = findViewById(R.id.id_savebutton);
