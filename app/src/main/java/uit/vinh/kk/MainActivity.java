@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,6 +31,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +40,12 @@ import uit.vinh.kk.Classifier.Recognition;
 //import org.tensorflow.lite.Interpreter;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener , Serializable {
     ArrayList<DataModel> dataModels;
+    private static ArrayList<Form> listForm = loadXMLData("//storage//emulated//0//patientData");
     ListView listView;
     private static CustomAdapter adapter;
-    private String TAG = "debug";
+    private static String TAG = "debug";
     protected TextView recognitionTextView,
             recognition1TextView,
             recognition2TextView,
@@ -77,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         // temp
         rgbFrameBitmap = Bitmap.createBitmap(640,480,Bitmap.Config.ARGB_8888);
+
+        Log.d(TAG, "Load main activity");
 
         try {
             classifier = new Classifier(this);
@@ -128,49 +133,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rotateBackward = AnimationUtils.loadAnimation(this,R.anim.rotate_backward);
         rotateForward = AnimationUtils.loadAnimation(this,R.anim.rotate_forward);
 
-        if(listView == null){
-            Log.d(TAG, "onCreate 1: Null cmnr");
-        }
+
         listView=findViewById(R.id.list);
-
-        if(listView == null){
-            Log.d(TAG, "onCreate 2: Null cmnr");
-        }
-        Log.d(TAG, "Here 6");
-
         dataModels= new ArrayList<>();
-        ArrayList<Form> listForm = loadXMLData("//storage//emulated//0//patientData");
+
         for(int i = 0; i < listForm.size(); i++){
             Log.d(TAG, i + " loadXMLData: " + listForm.get(i).toString());
             String tempname = listForm.get(i).getName();
-            String tempdob = listForm.get(i).getDateOfBirth();
+            String tempidForm = listForm.get(i).getID();
             String tempmedhis = listForm.get(i).getMedicalHistory();
             String temppersonalid = listForm.get(i).getPersonalID();
-            dataModels.add(new DataModel(tempname,temppersonalid,tempdob,tempdob + " - " + tempmedhis));
+            String tempdob = listForm.get(i).getDateOfBirth();
+
+            int len_secondline = Math.min((tempdob + " - " + tempmedhis).length(),50);
+            dataModels.add(new DataModel(tempname,temppersonalid,tempidForm,(tempdob + " - " + tempmedhis).substring(0,len_secondline)));
         }
 
 
-
-
-        Log.d(TAG, "Here 7");
-        dataModels.add(new DataModel("Apple Pie", "Android 1.0", "1","September 23, 2008"));
-        dataModels.add(new DataModel("Banana Bread", "Android 1.1", "2","February 9, 2009"));
-
-        Log.d(TAG, "Here 3");
         adapter= new CustomAdapter(dataModels,getApplicationContext());
-        Log.d(TAG, "Here 4");
         listView.setAdapter(adapter);
-        Log.d(TAG, "Here 5");
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                DataModel dataModel= dataModels.get(position);
-//
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                DataModel dataModel= dataModels.get(position);
+                Form selectedForm = findFormByID(dataModel.getIdForm());
+                //chuyển sang màn hình displaypatientinfo
+                //gửi dữ liệu cho màn hình mới
+                if(selectedForm!=null){
+                    Intent intent = new Intent(getApplicationContext(), DisplayPatientInfoActivity.class);
+                    intent.putExtra("patientinfo", selectedForm);
+                    Log.d(TAG, "selected form: " + selectedForm.toString() );
+                    getIntent().getSerializableExtra("patientinfo");
+                    startActivity(intent);
+                }
+
+
+
 //                Snackbar.make(view, dataModel.getName()+"\n"+dataModel.getType()+" API: "+dataModel.getVersion_number(), Snackbar.LENGTH_LONG)
 //                        .setAction("No action", null).show();
-//            }
-//        });
+            }
+        });
+    }
+
+    private Form findFormByID(String idForm){
+        for(int i = 0; i < listForm.size(); i++){
+            if(listForm.get(i).getID() == idForm){
+                return listForm.get(i);
+            }
+        }
+        return null;
     }
 
     private void animateFAB(){
@@ -224,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private ArrayList<Form> loadXMLData(String pathFile){
+    private static ArrayList<Form> loadXMLData(String pathFile){
         ArrayList<String> userData = new ArrayList<String>();
         ArrayList<Form> listForm = new ArrayList<Form>();
         FileInputStream fis = null;
@@ -319,8 +331,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 if(eventType == XmlPullParser.TEXT){
                     switch (tagName){
-                        case "personalID":
-                            newForm.setPersonalID(xpp.getText());
+                        case "ID":
+                            newForm.setID(xpp.getText());
+                            break;
+                        case "today":
+                            newForm.setToday(xpp.getText());
                             break;
                         case "name":
                             newForm.setName(xpp.getText());
@@ -328,9 +343,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         case "dob":
                             newForm.setDateOfBirth(xpp.getText());
                             break;
+                        case "sex":
+                            newForm.setSex(xpp.getText());
+                            break;
+                        case "personalID":
+                            newForm.setPersonalID(xpp.getText());
+                            break;
+                        case "result":
+                            newForm.setClassificationResult(xpp.getText());
+                            break;
+                        case "systolic":
+                            newForm.setBloodPressure_Systolic(xpp.getText());
+                            break;
+                        case "diastolic":
+                            newForm.setBloodPressure_Diastolic(xpp.getText());
+                            break;
+                        case "sugar":
+                            newForm.setBloodSugar(xpp.getText());
+                            break;
+                        case "hba1c":
+                            newForm.setHba1c(xpp.getText());
+                            break;
                         case "medhis":
                             newForm.setMedicalHistory(xpp.getText());
                             break;
+                        case "note":
+                            newForm.setNote(xpp.getText());
+                            break;
+//                        case "image":  // mở khi xử lý chỉn chu, vì string rất dàu
+//                            newForm.setImage(xpp.getText());
+//                            break;
                     }
                 }
             }

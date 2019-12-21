@@ -1,6 +1,8 @@
 package uit.vinh.kk;
 
-public class Form {
+import java.io.Serializable;
+
+public class Form implements Serializable {
     private String ID;
     private String today;
     private String name;

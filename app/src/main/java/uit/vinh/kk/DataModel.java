@@ -3,21 +3,25 @@ package uit.vinh.kk;
 public class DataModel {
     private String name;
     private String personalID;
-    private String result;
+    private String idForm;
     private String dateOfBirth;
+
+    public DataModel(String name, String personalID, String idForm, String dateOfBirth) {
+        this.name = name;
+        this.personalID = personalID;
+        this.idForm = idForm;
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public DataModel() {
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public DataModel(String name, String personalID, String result, String dateOfBirth) {
-        this.name = name;
-        this.personalID = personalID;
-        this.result = result;
-        this.dateOfBirth = dateOfBirth;
     }
 
     public String getPersonalID() {
@@ -28,12 +32,12 @@ public class DataModel {
         this.personalID = personalID;
     }
 
-    public String getResult() {
-        return result;
+    public String getIdForm() {
+        return idForm;
     }
 
-    public void setResult(String result) {
-        this.result = result;
+    public void setIdForm(String idForm) {
+        this.idForm = idForm;
     }
 
     public String getDateOfBirth() {
