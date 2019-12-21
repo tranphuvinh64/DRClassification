@@ -2,9 +2,46 @@ package uit.vinh.kk;
 
 public class Form {
     private String ID;
-    private String Name;
+    private String today;
+    private String name;
+    private String dateOfBirth;
+    private String sex;
+    private String personalID;
+    private String classificationResult;
+    private String bloodPressure_Systolic;
+    private String bloodPressure_Diastolic;
+    private String bloodSugar;
+    private String hba1c;
+    private String cholesterol;
+    private String image; // base64 string
+    private String medicalHistory;
+    private String note;
+
+    @Override
+    public String toString() {
+        return "Form{" +
+                "ID='" + ID + '\'' +
+                ", today='" + today + '\'' +
+                ", name='" + name + '\'' +
+                ", dateOfBirth='" + dateOfBirth + '\'' +
+                ", sex='" + sex + '\'' +
+                ", personalID='" + personalID + '\'' +
+                ", classificationResult='" + classificationResult + '\'' +
+                ", bloodPressure_Systolic='" + bloodPressure_Systolic + '\'' +
+                ", bloodPressure_Diastolic='" + bloodPressure_Diastolic + '\'' +
+                ", bloodSugar='" + bloodSugar + '\'' +
+                ", hba1c='" + hba1c + '\'' +
+                ", cholesterol='" + cholesterol + '\'' +
+                ", image='" + image + '\'' +
+                ", medicalHistory='" + medicalHistory + '\'' +
+                ", note='" + note + '\'' +
+                '}';
+    }
 
     public Form() {
+        this.ID = this.today = this.name = this.dateOfBirth = this.sex = this.personalID = this.classificationResult= "";
+        this.bloodPressure_Diastolic= this.bloodPressure_Systolic= this.bloodSugar= this.hba1c= this.cholesterol = "" ;
+        this.image = this.medicalHistory= this.note = "" ;
     }
 
     public String getID() {
@@ -15,19 +52,115 @@ public class Form {
         this.ID = ID;
     }
 
+    public String getToday() {
+        return today;
+    }
+
+    public void setToday(String today) {
+        this.today = today;
+    }
+
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return "Form{" +
-                "ID='" + ID + '\'' +
-                ", Name='" + Name + '\'' +
-                '}';
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getPersonalID() {
+        return personalID;
+    }
+
+    public void setPersonalID(String personalID) {
+        this.personalID = personalID;
+    }
+
+    public String getClassificationResult() {
+        return classificationResult;
+    }
+
+    public void setClassificationResult(String classificationResult) {
+        this.classificationResult = classificationResult;
+    }
+
+    public String getBloodPressure_Systolic() {
+        return bloodPressure_Systolic;
+    }
+
+    public void setBloodPressure_Systolic(String bloodPressure_Systolic) {
+        this.bloodPressure_Systolic = bloodPressure_Systolic;
+    }
+
+    public String getBloodPressure_Diastolic() {
+        return bloodPressure_Diastolic;
+    }
+
+    public void setBloodPressure_Diastolic(String bloodPressure_Diastolic) {
+        this.bloodPressure_Diastolic = bloodPressure_Diastolic;
+    }
+
+    public String getBloodSugar() {
+        return bloodSugar;
+    }
+
+    public void setBloodSugar(String bloodSugar) {
+        this.bloodSugar = bloodSugar;
+    }
+
+    public String getHba1c() {
+        return hba1c;
+    }
+
+    public void setHba1c(String hba1c) {
+        this.hba1c = hba1c;
+    }
+
+    public String getCholesterol() {
+        return cholesterol;
+    }
+
+    public void setCholesterol(String cholesterol) {
+        this.cholesterol = cholesterol;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getMedicalHistory() {
+        return medicalHistory;
+    }
+
+    public void setMedicalHistory(String medicalHistory) {
+        this.medicalHistory = medicalHistory;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

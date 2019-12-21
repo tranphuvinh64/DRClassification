@@ -137,7 +137,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d(TAG, "onCreate 2: Null cmnr");
         }
         Log.d(TAG, "Here 6");
+
         dataModels= new ArrayList<>();
+        ArrayList<Form> listForm = loadXMLData("//storage//emulated//0//patientData");
+        for(int i = 0; i < listForm.size(); i++){
+            Log.d(TAG, i + " loadXMLData: " + listForm.get(i).toString());
+            String tempname = listForm.get(i).getName();
+            String tempdob = listForm.get(i).getDateOfBirth();
+            String tempmedhis = listForm.get(i).getMedicalHistory();
+            String temppersonalid = listForm.get(i).getPersonalID();
+            dataModels.add(new DataModel(tempname,temppersonalid,tempdob,tempdob + " - " + tempmedhis));
+        }
+
+
+
+
         Log.d(TAG, "Here 7");
         dataModels.add(new DataModel("Apple Pie", "Android 1.0", "1","September 23, 2008"));
         dataModels.add(new DataModel("Banana Bread", "Android 1.1", "2","February 9, 2009"));
@@ -203,13 +217,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if (v.getId() == R.id.loaddata_floating_action_button){
             Log.d(TAG, "onClick: load data");
-            loadXMLData("//storage//emulated//0//patientData");
+
+
         }
 
     }
 
 
-    private void loadXMLData(String pathFile){
+    private ArrayList<Form> loadXMLData(String pathFile){
         ArrayList<String> userData = new ArrayList<String>();
         ArrayList<Form> listForm = new ArrayList<Form>();
         FileInputStream fis = null;
@@ -304,16 +319,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 if(eventType == XmlPullParser.TEXT){
                     switch (tagName){
-                        case "ID":
-                            Log.d(TAG, xpp.getText());
-                            newForm.setID(xpp.getText());
+                        case "personalID":
+                            newForm.setPersonalID(xpp.getText());
                             break;
-                        case "Name":
-                            Log.d(TAG, xpp.getText());
+                        case "name":
                             newForm.setName(xpp.getText());
                             break;
+                        case "dob":
+                            newForm.setDateOfBirth(xpp.getText());
+                            break;
+                        case "medhis":
+                            newForm.setMedicalHistory(xpp.getText());
+                            break;
                     }
-
                 }
             }
             try {
@@ -324,12 +342,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
-
-        for(int i = 0; i < listForm.size(); i++){
-            Log.d(TAG, i + " loadXMLData: " + listForm.get(i).toString());
-        }
-
-        return;
+        return listForm;
 
 
 

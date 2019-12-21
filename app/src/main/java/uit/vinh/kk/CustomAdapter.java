@@ -24,7 +24,6 @@ public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnCli
     private static class ViewHolder {
         TextView personalID;
         TextView Name;
-        TextView Result;
         TextView dateOfBirth;
     }
 
@@ -71,7 +70,6 @@ public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnCli
             viewHolder.Name = convertView.findViewById(R.id.row_item_name);
             viewHolder.dateOfBirth = convertView.findViewById(R.id.row_item_DoB);
             viewHolder.personalID = convertView.findViewById(R.id.row_item_personalID);
-            viewHolder.Result = convertView.findViewById(R.id.row_item_result);
 //            viewHolder.txtName = (TextView) convertView.findViewById(R.id.name);
 //            viewHolder.txtType = (TextView) convertView.findViewById(R.id.type);
 //            viewHolder.txtVersion = (TextView) convertView.findViewById(R.id.version_number);
@@ -89,7 +87,6 @@ public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnCli
         result.startAnimation(animation);
         lastPosition = position;
 
-        viewHolder.Result.setText(dataModel.getResult());
         viewHolder.Name.setText(dataModel.getName());
         viewHolder.personalID.setText(dataModel.getPersonalID());
         viewHolder.dateOfBirth.setText(dataModel.getDateOfBirth());

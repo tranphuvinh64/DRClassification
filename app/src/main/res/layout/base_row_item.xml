@@ -1,37 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="10dp">
 
-    <TextView
-        android:id="@+id/row_item_name"
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:text="Trần Văn ABCEFGH"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/black" />
-    <TextView
-        android:id="@+id/row_item_DoB"
-        android:layout_width="wrap_content"
+        android:src="@drawable/ic_arrow_forward"
+        android:background="@color/colorPrimary"
+        android:layout_gravity="center_vertical"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Ngày tháng năm sinh"
-        android:layout_marginTop="20dp" />
-    <TextView
-        android:id="@+id/row_item_result"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="Phân loại bệnh"/>
-    <TextView
-        android:id="@+id/row_item_personalID"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SốCMND12345678"
-        android:layout_marginLeft="200dp"/>
+        android:orientation="vertical"
+        android:layout_gravity="right">
+
+
+        <TextView
+            android:id="@+id/row_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:text="Trần Văn ABCEFGH"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/black" />
+        <TextView
+            android:id="@+id/row_item_DoB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ngày tháng năm sinh"
+            android:layout_marginTop="20dp" />
+        <TextView
+            android:id="@+id/row_item_personalID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SốCMND12345678"
+            android:layout_marginLeft="200dp"/>
+    </RelativeLayout>
 
 
 
-</RelativeLayout>
+
+</LinearLayout>

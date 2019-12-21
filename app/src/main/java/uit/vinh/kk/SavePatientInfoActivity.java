@@ -19,7 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 
-public class PatientInfoActivity extends AppCompatActivity implements View.OnClickListener {
+public class SavePatientInfoActivity extends AppCompatActivity implements View.OnClickListener {
     Button saveButton;
     EditText EdText_ID, EdText_Name;
     @Override
@@ -32,7 +32,6 @@ public class PatientInfoActivity extends AppCompatActivity implements View.OnCli
         EdText_ID = findViewById(R.id.id_ID);
         EdText_Name = findViewById(R.id.id_Name);
         saveButton.setOnClickListener(this);
-
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -70,12 +69,12 @@ public class PatientInfoActivity extends AppCompatActivity implements View.OnCli
                 xmlSerializer.setOutput(writer);
                 xmlSerializer.startDocument("UTF-8", true);
                 xmlSerializer.startTag(null, "patient");
-                xmlSerializer.startTag(null, "ID");
+                xmlSerializer.startTag(null, "id");
                 xmlSerializer.text(EdText_ID.getText().toString());
-                xmlSerializer.endTag(null, "ID");
-                xmlSerializer.startTag(null,"Name");
+                xmlSerializer.endTag(null, "id");
+                xmlSerializer.startTag(null,"name");
                 xmlSerializer.text(EdText_Name.getText().toString());
-                xmlSerializer.endTag(null, "Name");
+                xmlSerializer.endTag(null, "name");
                 xmlSerializer.endTag(null, "patient");
                 xmlSerializer.endDocument();
                 xmlSerializer.flush();

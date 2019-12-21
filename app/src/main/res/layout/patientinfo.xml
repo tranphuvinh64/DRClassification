@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Form ID">
+    </EditText>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/info_edittext_today"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/info_button_calendar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="calendar" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/info_edittext_fullname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Full Name">
+    </EditText>
+
+    <Spinner
+    android:id="@+id/info_spinner_sex"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Personal ID"
+        android:id="@+id/info_edittext_personalID"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/info_imageview_image"/>
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/info_spinner_result"/>
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Systolic"
+        android:id="@+id/info_edittext_bloodpressure_systolic"/>
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Diastolic"
+        android:id="@+id/info_edittext_bloodpressure_diastolic"/>
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Blood sugar"
+        android:id="@+id/info_edittext_bloodsugar"/>
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="hba1c"
+        android:id="@+id/info_edittext_hba1c"/>
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="HDL"
+        android:id="@+id/info_edittext_cholesterolHDL"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="HDL"
+        android:id="@+id/info_edittext_cholesterolLDL"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Medical history"
+        android:id="@+id/info_edittext_medical_history"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Medical history"
+        android:id="@+id/info_edittext_note"/>
+
+</LinearLayout>
