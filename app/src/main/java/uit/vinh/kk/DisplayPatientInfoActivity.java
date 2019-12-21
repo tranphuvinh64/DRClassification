@@ -1,6 +1,5 @@
 package uit.vinh.kk;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -35,7 +34,8 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         switch (item.getItemId())
         {
             case android.R.id.home:
-                backtoHomeScreen();
+                DisplayPatientInfoActivity.super.onBackPressed();
+                //backtoHomeScreen();
                 return true;
 
             default:break;
@@ -43,8 +43,8 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
 
         return super.onOptionsItemSelected(item);
     }
-    private void backtoHomeScreen(){
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
+//    private void backtoHomeScreen(){
+//        Intent intent = new Intent(this, MainActivity.class);
+//        startActivity(intent);
+//    }
 }

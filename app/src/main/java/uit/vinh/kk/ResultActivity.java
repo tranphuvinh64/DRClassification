@@ -34,7 +34,8 @@ public class ResultActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case android.R.id.home:
-                backtoHomeScreen();
+                ResultActivity.super.onBackPressed();
+                //backtoHomeScreen();
                 return true;
 
             default:break;
