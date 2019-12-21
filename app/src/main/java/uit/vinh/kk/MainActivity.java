@@ -12,6 +12,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +39,9 @@ import uit.vinh.kk.Classifier.Recognition;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    ArrayList<DataModel> dataModels;
+    ListView listView;
+    private static CustomAdapter adapter;
     private String TAG = "debug";
     protected TextView recognitionTextView,
             recognition1TextView,
@@ -124,7 +128,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rotateBackward = AnimationUtils.loadAnimation(this,R.anim.rotate_backward);
         rotateForward = AnimationUtils.loadAnimation(this,R.anim.rotate_forward);
 
+        if(listView == null){
+            Log.d(TAG, "onCreate 1: Null cmnr");
+        }
+        listView=findViewById(R.id.list);
 
+        if(listView == null){
+            Log.d(TAG, "onCreate 2: Null cmnr");
+        }
+        Log.d(TAG, "Here 6");
+        dataModels= new ArrayList<>();
+        Log.d(TAG, "Here 7");
+        dataModels.add(new DataModel("Apple Pie", "Android 1.0", "1","September 23, 2008"));
+        dataModels.add(new DataModel("Banana Bread", "Android 1.1", "2","February 9, 2009"));
+
+        Log.d(TAG, "Here 3");
+        adapter= new CustomAdapter(dataModels,getApplicationContext());
+        Log.d(TAG, "Here 4");
+        listView.setAdapter(adapter);
+        Log.d(TAG, "Here 5");
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                DataModel dataModel= dataModels.get(position);
+//
+//                Snackbar.make(view, dataModel.getName()+"\n"+dataModel.getType()+" API: "+dataModel.getVersion_number(), Snackbar.LENGTH_LONG)
+//                        .setAction("No action", null).show();
+//            }
+//        });
     }
 
     private void animateFAB(){
@@ -154,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             isOpen = true;
         }
     }
+
     @Override
     public void onClick(View v){
         if(v.getId() == R.id.btnClassify){
@@ -174,6 +207,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+
+
     private void loadXMLData(String pathFile){
         ArrayList<String> userData = new ArrayList<String>();
         ArrayList<Form> listForm = new ArrayList<Form>();
@@ -334,9 +369,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        Log.d("read file result", password);
 
 
-
-
     }
+
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
