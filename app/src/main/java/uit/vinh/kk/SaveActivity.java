@@ -101,11 +101,14 @@ public class SaveActivity extends AppCompatActivity {
                 // mở xml và lưu
 
                 // chuyển về màn hình chính
+
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // xóa các màn hình trước
                 startActivity(intent);
 
                 // hiển thị Toast thông báo đã lưu
                 Toast.makeText(getApplicationContext(), "Infomation has been saved successfully", Toast.LENGTH_SHORT).show();
+
                 break;
             default:break;
         }

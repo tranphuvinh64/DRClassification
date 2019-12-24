@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -89,12 +90,28 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         spinner_result.setEnabled(false);
         spinner_sex.setEnabled(false);
 
-
+        edittext_idForm.setText(prevForm.getID());
         edittext_patientName.setText(prevForm.getName());
+        edittext_today.setText(prevForm.getToday());
+        edittext_dateOfBirth.setText(prevForm.getDateOfBirth());
+        edittext_personalID.setText(prevForm.getPersonalID());
+        edittext_systolic.setText(prevForm.getBloodPressure_Systolic());
+        edittext_diastolic.setText(prevForm.getBloodPressure_Diastolic());
+        edittext_bloodSugar.setText(prevForm.getBloodSugar());
+        edittext_hba1c.setText(prevForm.getHba1c());
+        edittext_hdl.setText(prevForm.getCholesterolHDL());
+        edittext_ldl.setText(prevForm.getCholesterolLDL());
+        edittext_medicalHistory.setText(prevForm.getMedicalHistory());
+        edittext_note.setText(prevForm.getNote());
+
+
+        spinner_result.setSelection(((ArrayAdapter)spinner_result.getAdapter()).getPosition(prevForm.getClassificationResult()));
+        spinner_sex.setSelection(((ArrayAdapter)spinner_sex.getAdapter()).getPosition(prevForm.getSex()));
 
     }
 
-    @Override
+
+        @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId())
         {

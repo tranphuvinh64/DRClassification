@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String tempdob = listForm.get(i).getDateOfBirth();
             String tempresult = listForm.get(i).getClassificationResult();
 
-            int len_secondline = Math.min((tempdob + " - " + tempmedhis).length(),50);
+            int len_secondline = Math.min((tempdob + " - " + tempmedhis).length(),45);
             dataModels.add(new DataModel(tempname,temppersonalid,tempidForm,(tempdob + " - " + tempmedhis).substring(0,len_secondline),tempresult));
 
         }
@@ -280,11 +280,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
-
-
         Form newForm = null;
         while (eventType != XmlPullParser.END_DOCUMENT){
             if (xpp.getName() != null && xpp.getName().equals("patient")){
+
                 Log.d(TAG, "here 1");
                 if(eventType == XmlPullParser.START_TAG){
                     newForm = new Form();
@@ -294,7 +293,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     newForm = null;
                 }
             }
-
             else if(eventType == XmlPullParser.START_TAG)
             {
                 String tagName = xpp.getName();
@@ -347,6 +345,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         case "note":
                             newForm.setNote(xpp.getText());
                             break;
+                        case "hdl":
+                            newForm.setCholesterolHDL(xpp.getText());
+                            break;
+                        case "ldl":
+                            newForm.setCholesterolLDL(xpp.getText());
+                            break;
 //                        case "image":  // mở khi xử lý chỉn chu, vì string rất dàu
 //                            newForm.setImage(xpp.getText());
 //                            break;
@@ -362,45 +366,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         return listForm;
-
-
-
-//        while (eventType != XmlPullParser.END_DOCUMENT){
-//            if (eventType == XmlPullParser.START_DOCUMENT) {
-//                System.out.println("Start document");
-//
-//            }
-//            else if (eventType == XmlPullParser.START_TAG) {
-//                System.out.println("Start tag "+xpp.getName());
-//            }
-//            else if (eventType == XmlPullParser.END_TAG) {
-//                System.out.println("End tag "+xpp.getName());
-//            }
-//            else if(eventType == XmlPullParser.TEXT) {
-//                userData.add(xpp.getText());
-//            }
-//            try {
-//                eventType = xpp.next();
-//            }
-//            catch (XmlPullParserException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//            catch (IOException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//        }
-//        for(int i = 0; i< userData.size();i++){
-//            Log.d(TAG, userData.get(i));
-//        }
-//        String userName = userData.get(0);
-//        String password = userData.get(1);
-//
-//        Log.d("read file result", userName);
-//        Log.d("read file result", password);
-
-
     }
 
     @Override
