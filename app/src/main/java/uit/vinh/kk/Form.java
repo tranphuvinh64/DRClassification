@@ -14,35 +14,17 @@ public class Form implements Serializable {
     private String bloodPressure_Diastolic;
     private String bloodSugar;
     private String hba1c;
-    private String cholesterol;
+    private String cholesterolHDL;
+    private String cholesterolLDL;
     private String image; // base64 string
     private String medicalHistory;
     private String note;
 
-    @Override
-    public String toString() {
-        return "Form{" +
-                "ID='" + ID + '\'' +
-                ", today='" + today + '\'' +
-                ", name='" + name + '\'' +
-                ", dateOfBirth='" + dateOfBirth + '\'' +
-                ", sex='" + sex + '\'' +
-                ", personalID='" + personalID + '\'' +
-                ", classificationResult='" + classificationResult + '\'' +
-                ", bloodPressure_Systolic='" + bloodPressure_Systolic + '\'' +
-                ", bloodPressure_Diastolic='" + bloodPressure_Diastolic + '\'' +
-                ", bloodSugar='" + bloodSugar + '\'' +
-                ", hba1c='" + hba1c + '\'' +
-                ", cholesterol='" + cholesterol + '\'' +
-                ", image='" + image + '\'' +
-                ", medicalHistory='" + medicalHistory + '\'' +
-                ", note='" + note + '\'' +
-                '}';
-    }
+
 
     public Form() {
         this.ID = this.today = this.name = this.dateOfBirth = this.sex = this.personalID = this.classificationResult= "";
-        this.bloodPressure_Diastolic= this.bloodPressure_Systolic= this.bloodSugar= this.hba1c= this.cholesterol = "" ;
+        this.bloodPressure_Diastolic= this.bloodPressure_Systolic= this.bloodSugar= this.hba1c= this.cholesterolHDL = this.cholesterolLDL ="" ;
         this.image = this.medicalHistory= this.note = "" ;
     }
 
@@ -134,14 +116,6 @@ public class Form implements Serializable {
         this.hba1c = hba1c;
     }
 
-    public String getCholesterol() {
-        return cholesterol;
-    }
-
-    public void setCholesterol(String cholesterol) {
-        this.cholesterol = cholesterol;
-    }
-
     public String getImage() {
         return image;
     }
@@ -164,5 +138,43 @@ public class Form implements Serializable {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getCholesterolHDL() {
+        return cholesterolHDL;
+    }
+
+    public void setCholesterolHDL(String cholesterolHDL) {
+        this.cholesterolHDL = cholesterolHDL;
+    }
+
+    public String getCholesterolLDL() {
+        return cholesterolLDL;
+    }
+
+    public void setCholesterolLDL(String cholesterolLDL) {
+        this.cholesterolLDL = cholesterolLDL;
+    }
+
+    @Override
+    public String toString() {
+        return "Form{" +
+                "ID='" + ID + '\'' +
+                ", today='" + today + '\'' +
+                ", name='" + name + '\'' +
+                ", dateOfBirth='" + dateOfBirth + '\'' +
+                ", sex='" + sex + '\'' +
+                ", personalID='" + personalID + '\'' +
+                ", classificationResult='" + classificationResult + '\'' +
+                ", bloodPressure_Systolic='" + bloodPressure_Systolic + '\'' +
+                ", bloodPressure_Diastolic='" + bloodPressure_Diastolic + '\'' +
+                ", bloodSugar='" + bloodSugar + '\'' +
+                ", hba1c='" + hba1c + '\'' +
+                ", cholesterolHDL='" + cholesterolHDL + '\'' +
+                ", cholesterolLDL='" + cholesterolLDL + '\'' +
+                ", image='" + image + '\'' +
+                ", medicalHistory='" + medicalHistory + '\'' +
+                ", note='" + note + '\'' +
+                '}';
     }
 }

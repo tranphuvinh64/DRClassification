@@ -3,7 +3,6 @@ package uit.vinh.kk;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -176,6 +175,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        .setAction("No action", null).show();
             }
         });
+
+
+    btnClassify.setVisibility(View.INVISIBLE);
+        recognitionTextView.setVisibility(View.INVISIBLE);
+        recognition1TextView.setVisibility(View.INVISIBLE);
+        recognition2TextView.setVisibility(View.INVISIBLE);
+        recognition3TextView.setVisibility(View.INVISIBLE);
+        recognition4TextView.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -233,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(v.getId() == R.id.btnClassify){
             processImage();
         }
-        else if(v.getId() == R.id.browseimage_floating_action_button){
+        if(v.getId() == R.id.browseimage_floating_action_button){
             ImagePicker.create(MainActivity.this).start();
         }
         else if (v.getId() == R.id.info_floating_action_button){
@@ -445,8 +452,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
             Image images = ImagePicker.getFirstImageOrNull(data);
+            // gửi ảnh qua result activity
+            if (images!=null){
+                Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
+                intent.putExtra("imagetest", images);
+                getIntent().getSerializableExtra("imagetest");
+                startActivity(intent);
+            }
+
             Log.i("IMAGE",images.getPath());
-            imgImport.setImageURI(Uri.parse(images.getPath()));
+            Log.d(TAG, images.getClass().getName());
+            //imgImport.setImageURI(Uri.parse(images.getPath()));
 
             BitmapFactory.Options optionstemp = new BitmapFactory.Options();
             optionstemp.inPreferredConfig = Bitmap.Config.ARGB_4444;
@@ -455,6 +471,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d("debug", "bitmap null");
             }
             Log.d("debug", "converted bitmap");
+            Log.d("image type", rgbFrameBitmap.getClass().getName());
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);

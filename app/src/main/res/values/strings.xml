@@ -2,4 +2,17 @@
     <string name="app_name">DRClassification</string>
     <string name="btnImportImage">browse image</string>
     <string name="btnClassify">Classify image</string>
+
+    <string-array name="spinner_sex_type">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
+    <string-array name="spinner_classification_result">
+        <item>No DR</item>
+        <item>Mild</item>
+        <item>Moderate</item>
+        <item>Severe</item>
+        <item>Proliferative</item>
+    </string-array>
 </resources>

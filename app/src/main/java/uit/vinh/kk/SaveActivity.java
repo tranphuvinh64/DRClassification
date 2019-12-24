@@ -5,14 +5,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class DisplayPatientInfoActivity extends AppCompatActivity{
+public class SaveActivity extends AppCompatActivity {
     private EditText edittext_idForm;
     private EditText edittext_today;
     private EditText edittext_patientName;
@@ -32,10 +32,11 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
 
     private Spinner spinner_sex;
     private Spinner spinner_result;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.patientinfo);
+        setContentView(R.layout.activity_save);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // create components
@@ -60,68 +61,60 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
 
         button_calendarDOB = findViewById(R.id.info_button_calendar_dob);
         button_calendarToday = findViewById(R.id.info_button_calendar_today);
-//        textView.setTag(textView.getKeyListener());
-//        textView.setKeyListener(null);
-        //Name.setTag(Name.getKeyListener());
-
-        // lấy dữ liệu từ activity trước
-        Form prevForm = (Form)getIntent().getSerializableExtra("patientinfo");
-        Log.d("debug", "previous info: " + prevForm.getName());
-        // không cho sửa khi đang view
-
-        edittext_idForm.setKeyListener(null);
-        edittext_today.setKeyListener(null);
-        edittext_patientName.setKeyListener(null);
-        edittext_dateOfBirth.setKeyListener(null);
-        edittext_personalID.setKeyListener(null);
-        edittext_systolic.setKeyListener(null);
-        edittext_diastolic.setKeyListener(null);
-        edittext_bloodSugar.setKeyListener(null);
-        edittext_hba1c.setKeyListener(null);
-        edittext_hdl.setKeyListener(null);
-        edittext_ldl.setKeyListener(null);
-        edittext_medicalHistory.setKeyListener(null);
-        edittext_note.setKeyListener(null);
-
-        button_calendarDOB.setVisibility(View.INVISIBLE);
-        button_calendarToday.setVisibility(View.INVISIBLE);
-
-        spinner_result.setEnabled(false);
-        spinner_sex.setEnabled(false);
+        //tạo giá trị cho spinner
 
 
-        edittext_patientName.setText(prevForm.getName());
+        // auto get ngày hôm nay set vào edittext
 
+        // bắt sự kiện bấm button hiện calendar
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId())
         {
             case android.R.id.home:
-                DisplayPatientInfoActivity.super.onBackPressed();
+                SaveActivity.super.onBackPressed();
                 //backtoHomeScreen();
                 return true;
-            case R.id.menu_edit:
-                // gửi thông tin để biết là lưu thông tin edit
+            case R.id.menu_save:
 
-                // chuyển màn hình SaveActivity
-                Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
+                // get dữ liệu từ các EditText
+                Form saveForm = new Form();
+                saveForm.setToday(edittext_today.getText().toString());
+                saveForm.setName(edittext_patientName.getText().toString());
+                saveForm.setDateOfBirth(edittext_dateOfBirth.getText().toString());
+                saveForm.setPersonalID(edittext_personalID.getText().toString());
+                saveForm.setBloodPressure_Systolic(edittext_systolic.getText().toString());
+                saveForm.setBloodPressure_Diastolic(edittext_diastolic.getText().toString());
+                saveForm.setBloodSugar(edittext_bloodSugar.getText().toString());
+                saveForm.setHba1c(edittext_hba1c.getText().toString());
+                saveForm.setCholesterolLDL(edittext_ldl.getText().toString());
+                saveForm.setCholesterolHDL(edittext_hdl.getText().toString());
+                saveForm.setMedicalHistory(edittext_medicalHistory.getText().toString());
+                saveForm.setNote(edittext_note.getText().toString());
+
+                saveForm.setSex(spinner_sex.getSelectedItem().toString());
+                saveForm.setClassificationResult(spinner_result.getSelectedItem().toString());
+
+                Log.d("debug", "thông tin bệnh nhân" + saveForm.toString());
+
+                // mở xml và lưu
+
+                // chuyển về màn hình chính
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
+
+                // hiển thị Toast thông báo đã lưu
+                Toast.makeText(getApplicationContext(), "Infomation has been saved successfully", Toast.LENGTH_SHORT).show();
                 break;
             default:break;
         }
 
         return super.onOptionsItemSelected(item);
     }
-//    private void backtoHomeScreen(){
-//        Intent intent = new Intent(this, MainActivity.class);
-//        startActivity(intent);
-//    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_actionbar_edit, menu);
+        getMenuInflater().inflate(R.menu.menu_actionbar_save, menu);
         return true;
     }
 }
