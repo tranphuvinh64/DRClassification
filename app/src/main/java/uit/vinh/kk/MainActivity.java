@@ -120,7 +120,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String tempresult = listForm.get(i).getClassificationResult();
 
             int len_secondline = Math.min((tempdob + " - " + tempmedhis).length(),50);
-            dataModels.add(new DataModel(tempname,temppersonalid,tempidForm,(tempdob + " - " + tempmedhis).substring(0,len_secondline)));
+            dataModels.add(new DataModel(tempname,temppersonalid,tempidForm,(tempdob + " - " + tempmedhis).substring(0,len_secondline),tempresult));
+
         }
 
 

@@ -5,12 +5,14 @@ public class DataModel {
     private String personalID;
     private String idForm;
     private String dateOfBirth;
+    private String result;
 
-    public DataModel(String name, String personalID, String idForm, String dateOfBirth) {
+    public DataModel(String name, String personalID, String idForm, String dateOfBirth, String result) {
         this.name = name;
         this.personalID = personalID;
         this.idForm = idForm;
         this.dateOfBirth = dateOfBirth;
+        this.result = result;
     }
 
     public DataModel() {
@@ -46,5 +48,13 @@ public class DataModel {
 
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }

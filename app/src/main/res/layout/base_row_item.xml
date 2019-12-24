@@ -4,13 +4,26 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="10dp">
-
-    <ImageView
+    <RelativeLayout
+        android:id="@+id/icon_back"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_arrow_forward"
-        android:background="@color/colorPrimary"
-        android:layout_gravity="center_vertical"/>
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageview_icon_result"
+            android:layout_width="@dimen/icon_width_height"
+            android:layout_height="@dimen/icon_width_height"
+            android:src="@drawable/bg_circle_mild" />
+
+        <TextView
+            android:id="@+id/icon_text_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/icon_text"
+            android:text="N"/>
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
