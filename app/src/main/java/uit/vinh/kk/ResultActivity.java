@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,6 +22,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class ResultActivity extends AppCompatActivity implements View.OnClickListener {
+    protected TextView recognitionTextView,
+            recognition1TextView,
+            recognition2TextView,
+            recognition3TextView,
+            recognition4TextView,
+            recognitionValueTextView,
+            recognition1ValueTextView,
+            recognition2ValueTextView,
+            recognition3ValueTextView,
+            recognition4ValueTextView;
     ImageView imageView;
     Button buttonSave;
     @Override
@@ -30,6 +41,23 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         imageView = findViewById(R.id.imageview_fundus);
         buttonSave = findViewById(R.id.buttonSaveData);
         buttonSave.setOnClickListener(this);
+        //        recognitionTextView = findViewById(R.id.detected_item);
+//        recognitionValueTextView = findViewById(R.id.detected_item_value);
+//        recognition1TextView = findViewById(R.id.detected_item1);
+//        recognition1ValueTextView = findViewById(R.id.detected_item1_value);
+//        recognition2TextView = findViewById(R.id.detected_item2);
+//        recognition2ValueTextView = findViewById(R.id.detected_item2_value);
+//        recognition3TextView = findViewById(R.id.detected_item3);
+//        recognition3ValueTextView = findViewById(R.id.detected_item3_value);
+//        recognition4TextView = findViewById(R.id.detected_item4);
+//        recognition4ValueTextView = findViewById(R.id.detected_item4_value);
+//        recognitionTextView.setText("Level 0");
+//        recognition1TextView.setText("Level 1");
+//        recognition2TextView.setText("Level 2");
+//        recognition3TextView.setText("Level 3");
+//        recognition4TextView.setText("Level 4");
+
+
 //        Toolbar toolbar = findViewById(R.id.displaypatientinfo);
 //
 //        setSupportActionBar(toolbar);

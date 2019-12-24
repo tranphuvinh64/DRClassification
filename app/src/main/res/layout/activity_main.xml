@@ -18,144 +18,142 @@
             android:layout_height="wrap_content"
             />
 
-        <Button
-            android:id="@+id/btnClassify"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btnClassify">
-        </Button>
+<!--        <Button-->
+<!--            android:id="@+id/btnClassify"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@string/btnClassify">-->
+<!--        </Button>-->
 
-        <LinearLayout
-            android:id="@+id/gesture_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
+<!--        <LinearLayout-->
+<!--            android:id="@+id/gesture_layout"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical"-->
+<!--            android:paddingTop="10dp"-->
+<!--            android:paddingBottom="10dp">-->
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:orientation="horizontal">-->
 
-                <TextView
-                    android:id="@+id/detected_item"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/detected_item"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:textColor="@android:color/black"-->
+<!--                    android:textSize="16sp" />-->
 
-                <TextView
-                    android:id="@+id/detected_item_value"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/detected_item_value"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="right"-->
+<!--                    android:textColor="@android:color/black"-->
+<!--                    android:textSize="12sp" />-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:orientation="horizontal">-->
 
-                <TextView
-                    android:id="@+id/detected_item1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/detected_item1"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:textColor="@android:color/darker_gray"-->
+<!--                    android:textSize="12sp" />-->
 
-                <TextView
-                    android:id="@+id/detected_item1_value"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/detected_item1_value"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="right"-->
+<!--                    android:textColor="@android:color/darker_gray"-->
+<!--                    android:textSize="12sp" />-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:orientation="horizontal">-->
 
-                <TextView
-                    android:id="@+id/detected_item2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/detected_item2"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:textColor="@android:color/darker_gray"-->
+<!--                    android:textSize="12sp" />-->
 
-                <TextView
-                    android:id="@+id/detected_item2_value"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/detected_item2_value"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="right"-->
+<!--                    android:textColor="@android:color/darker_gray"-->
+<!--                    android:textSize="12sp" />-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:orientation="horizontal">-->
 
-                <TextView
-                    android:id="@+id/detected_item3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/detected_item3"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:textColor="@android:color/darker_gray"-->
+<!--                    android:textSize="12sp" />-->
 
-                <TextView
-                    android:id="@+id/detected_item3_value"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/detected_item3_value"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="right"-->
+<!--                    android:textColor="@android:color/darker_gray"-->
+<!--                    android:textSize="12sp" />-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:orientation="horizontal">-->
 
-                <TextView
-                    android:id="@+id/detected_item4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/detected_item4"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:textColor="@android:color/darker_gray"-->
+<!--                    android:textSize="12sp" />-->
 
-                <TextView
-                    android:id="@+id/detected_item4_value"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/detected_item4_value"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="right"-->
+<!--                    android:textColor="@android:color/darker_gray"-->
+<!--                    android:textSize="12sp" />-->
 
-            </LinearLayout>
-        </LinearLayout>
+<!--            </LinearLayout>-->
+<!--        </LinearLayout>-->
 
     </LinearLayout>
 
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
-
+        android:layout_height="match_parent" />
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -182,7 +180,27 @@
                 app:fabSize="mini"
                 app:srcCompat="@drawable/ic_image_upload" />
         </LinearLayout>
-
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:visibility="invisible"
+            android:id="@+id/usecamera_linear_layout">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Introduction"
+                android:layout_gravity="center"
+                android:id="@+id/usecamera_textview"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/usecamera_floating_action_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_margin="16dp"
+                app:fabSize="mini"
+                app:srcCompat="@drawable/ic_info" />
+        </LinearLayout>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -205,27 +223,7 @@
                 app:srcCompat="@drawable/ic_info" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/loaddata_linear_layout"
-            android:layout_gravity="bottom|right"
-            android:visibility="invisible">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Load data"
-                android:layout_gravity="center"/>
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/loaddata_floating_action_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_margin="16dp"
-                app:fabSize="mini"
-                app:srcCompat="@drawable/ic_view" />
 
-        </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floating_action_button"
