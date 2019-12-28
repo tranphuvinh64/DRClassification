@@ -6,6 +6,5 @@
     android:elevation="4dp"
     android:orientation="vertical"
     android:background="@color/colorPrimary"
-    app:menu="@menu/menu_back_forward"
-    android:id="@+id/patientinfo_toolbar">
+    app:menu="@menu/menu_back_forward">
 </androidx.appcompat.widget.Toolbar>

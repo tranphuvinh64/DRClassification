@@ -48,5 +48,4 @@ public final class CONSTANTS {
     public static final int COLUMN_NOTE_INDEX = 14;
     public static final int COLUMN_ORIGINAL_IMAGE_INDEX = 15;
     public static final int COLUMN_CONTRAST_ENHANCE_INDEX = 16;
-
 }

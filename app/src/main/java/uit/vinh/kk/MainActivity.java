@@ -12,11 +12,15 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
 
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
@@ -48,8 +52,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ListView listView;
     private static CustomAdapter adapter;
     private static String TAG = "debug";
-
-    LinearLayout browseImageLinearLayout, infoLinearLayout;
+    Toolbar searchToolbar;
+    LinearLayout browseImageLinearLayout, infoLinearLayout, useCameraLinearLayout;
+    FrameLayout mainLayout;
+    View blurView;
     FloatingActionButton floatingActionButtonNew, floatingActionButtonBrowse, floatingActionButtonInfo;
     Animation fabOpen, fabClose, rotateBackward, rotateForward;
     boolean isOpen = false;
@@ -82,14 +88,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // initial components
         setContentView(R.layout.activity_main);
 
-
-        //btnClassify = findViewById(R.id.btnClassify);
-        //imgImport = findViewById(R.id.imgImport);
-
-
-
+        //getSupportActionBar().hide();
         browseImageLinearLayout = findViewById(R.id.browseimage_linear_layout);
         infoLinearLayout = findViewById(R.id.info_linear_layout);
+        useCameraLinearLayout = findViewById(R.id.usecamera_linear_layout);
+        mainLayout = findViewById(R.id.main);
+        mainLayout.setOnClickListener(this);
+
+        blurView = findViewById(R.id.shadowView);
+        blurView.setOnClickListener(this);
         //loadDataLinearLayout = findViewById(R.id.loaddata_linear_layout);
 
         floatingActionButtonNew =findViewById(R.id.floating_action_button);
@@ -126,9 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String tempresult = listForm.get(i).getClassificationResult();
             int len_secondline = Math.min((tempdob + " - " + tempmedhis).length(),CONSTANTS.MAX_LENGTH_STRING);
             dataModels.add(new DataModel(tempname,temppersonalid,tempidForm,(tempdob + " - " + tempmedhis).substring(0,len_secondline),tempresult));
-
         }
-
 
         adapter= new CustomAdapter(dataModels,getApplicationContext());
         listView.setAdapter(adapter);
@@ -148,8 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
-
-        loadSQLiteData();
+        //loadSQLiteData();
     }
 
 
@@ -157,6 +161,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == R.id.menu_search){
             Log.d(TAG, "icon search clicked");
+
+            //setSupportActionBar(actionbar);
+
+            getSupportActionBar().hide();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -164,6 +172,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_actionbar_search, menu);
+        MenuItem searchViewItem = menu.findItem(R.id.menu_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchViewItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchView.clearFocus();
+             /*   if(list.contains(query)){
+                    adapter.getFilter().filter(query);
+                }else{
+                    Toast.makeText(MainActivity.this, "No Match found",Toast.LENGTH_LONG).show();
+                }*/
+                return false;
+
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
         return true;
     }
 
@@ -180,20 +209,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(isOpen){
             floatingActionButtonNew.startAnimation(rotateBackward);
             browseImageLinearLayout.startAnimation(fabClose);
+            useCameraLinearLayout.startAnimation(fabClose);
             infoLinearLayout.startAnimation(fabClose);
             //loadDataLinearLayout.startAnimation(fabClose);
             floatingActionButtonBrowse.setClickable(false);
             floatingActionButtonInfo.setClickable(false);
+            View v = findViewById( R.id.shadowView);
+            v.setVisibility(View.GONE);
+            listView.setEnabled(true);
+            Log.d(TAG, "animateFAB: set clickable 1");
             isOpen = false;
         }
         else
         {
             floatingActionButtonNew.startAnimation(rotateForward);
             browseImageLinearLayout.startAnimation(fabOpen);
+            useCameraLinearLayout.startAnimation(fabOpen);
             infoLinearLayout.startAnimation(fabOpen);
             //loadDataLinearLayout.startAnimation(fabOpen);
             floatingActionButtonBrowse.setClickable(true);
             floatingActionButtonInfo.setClickable(true);
+            View v = findViewById( R.id.shadowView);
+            v.setVisibility(View.VISIBLE);
+            listView.setEnabled(false);
+            Log.d(TAG, "animateFAB: set clickable 2");
             isOpen = true;
         }
     }
@@ -220,8 +259,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if (v.getId() == R.id.floating_action_button){
             animateFAB();
-
         }
+        else if (v.getId() == R.id.shadowView){
+            Log.d(TAG, "onClick: main layout clicked");
+            animateFAB();
+        }
+
 
     }
 
