@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SaveActivity extends AppCompatActivity {
+    DatabaseHelper formDatabase ;
     private EditText edittext_idForm;
     private EditText edittext_today;
     private EditText edittext_patientName;
@@ -36,17 +38,15 @@ public class SaveActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_save);
+        setContentView(R.layout.patientinfo);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // create components
-        edittext_idForm = findViewById(R.id.info_edittext_idform);
+        //edittext_idForm = findViewById(R.id.info_edittext_idform);
         edittext_today = findViewById(R.id.info_edittext_today);
         edittext_patientName = findViewById(R.id.info_edittext_fullname);
         edittext_dateOfBirth = findViewById(R.id.info_edittext_dob);
-        //spinner sex later
         edittext_personalID = findViewById(R.id.info_edittext_personalID);
-        // spinner result
         edittext_systolic = findViewById(R.id.info_edittext_bloodpressure_systolic);
         edittext_diastolic = findViewById(R.id.info_edittext_bloodpressure_diastolic);
         edittext_bloodSugar = findViewById(R.id.info_edittext_bloodsugar);
@@ -61,12 +61,37 @@ public class SaveActivity extends AppCompatActivity {
 
         button_calendarDOB = findViewById(R.id.info_button_calendar_dob);
         button_calendarToday = findViewById(R.id.info_button_calendar_today);
+
+        formDatabase = new DatabaseHelper(this);
+
+        String SaveAs = (String) getIntent().getSerializableExtra("Save As");
+        if (SaveAs.equals(CONSTANTS.SAVE_AS_MODE_EDIT)){
+            Form oldForm = (Form)getIntent().getSerializableExtra("oldform");
+            edittext_today.setText(oldForm.getToday());
+            edittext_patientName.setText(oldForm.getName());
+            edittext_dateOfBirth.setText(oldForm.getDateOfBirth());
+            edittext_personalID.setText(oldForm.getPersonalID());
+            edittext_systolic.setText(oldForm.getBloodPressure_Systolic());
+            edittext_diastolic.setText(oldForm.getBloodPressure_Diastolic());
+            edittext_bloodSugar.setText(oldForm.getBloodSugar());
+            edittext_hba1c.setText(oldForm.getHba1c());
+            edittext_hdl.setText(oldForm.getCholesterolHDL());
+            edittext_ldl.setText(oldForm.getCholesterolLDL());
+            edittext_medicalHistory.setText(oldForm.getMedicalHistory());
+            edittext_note.setText(oldForm.getNote());
+
+            spinner_result.setSelection(((ArrayAdapter)spinner_result.getAdapter()).getPosition(oldForm.getClassificationResult()));
+            spinner_sex.setSelection(((ArrayAdapter)spinner_sex.getAdapter()).getPosition(oldForm.getSex()));
+
+        }
+        else if (SaveAs.equals(CONSTANTS.SAVE_AS_MODE_NEW)){
+            // auto get ngày hôm nay set vào edittext
+        }
         //tạo giá trị cho spinner
 
-
-        // auto get ngày hôm nay set vào edittext
-
         // bắt sự kiện bấm button hiện calendar
+
+
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -77,8 +102,9 @@ public class SaveActivity extends AppCompatActivity {
                 //backtoHomeScreen();
                 return true;
             case R.id.menu_save:
+                String SaveAs = (String) getIntent().getSerializableExtra("Save As");
+                Form prevForm = (Form)getIntent().getSerializableExtra("oldform");
 
-                // get dữ liệu từ các EditText
                 Form saveForm = new Form();
                 saveForm.setToday(edittext_today.getText().toString());
                 saveForm.setName(edittext_patientName.getText().toString());
@@ -95,19 +121,53 @@ public class SaveActivity extends AppCompatActivity {
 
                 saveForm.setSex(spinner_sex.getSelectedItem().toString());
                 saveForm.setClassificationResult(spinner_result.getSelectedItem().toString());
+                // nếu là edit bệnh nhân
+                if (SaveAs.equals("OLD")){
+                    boolean isUpdated = formDatabase.updateData(prevForm.getID(), saveForm);
+                    if(isUpdated == true){
+                        Log.d("debug", "Update successfully");
+                        // hiển thị Toast thông báo đã lưu
+                        Toast.makeText(getApplicationContext(), "Infomation has been updated successfully", Toast.LENGTH_SHORT).show();
+                        // chuyển về màn hình chính
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // xóa các màn hình trước
+                        startActivity(intent);
+                    }
+                    else{
+                        Log.d("debug", "Update unsuccessfully");
+                        // hiển thị Toast thông báo đã lưu
+                        Toast.makeText(getApplicationContext(), "Sorry! Unexpected error!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                // nếu là lưu mới thông tin bệnh nhân
+                else if (SaveAs.equals("NEW")){
+                    Log.d("debug", saveForm.toString());
+                    boolean isInserted = formDatabase.insertNewForm(saveForm);
+                    Log.d("debug", "isInserted ==" + isInserted);
+                    if(isInserted == true){
+                        Log.d("debug", "Inserted successfully");
+                        // hiển thị Toast thông báo đã lưu
+                        Toast.makeText(getApplicationContext(), "Infomation has been saved successfully", Toast.LENGTH_SHORT).show();
+                        // chuyển về màn hình chính
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // xóa các màn hình trước
+                        startActivity(intent);
+                    }
+                    else{
+                        Log.d("debug", "Inserted unsuccessfully");
+                        // hiển thị Toast thông báo đã lưu
+                        Toast.makeText(getApplicationContext(), "Sorry! Unexpected error!", Toast.LENGTH_SHORT).show();
+                    }
+                }
 
-                Log.d("debug", "thông tin bệnh nhân" + saveForm.toString());
+
+
 
                 // mở xml và lưu
 
-                // chuyển về màn hình chính
 
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // xóa các màn hình trước
-                startActivity(intent);
 
-                // hiển thị Toast thông báo đã lưu
-                Toast.makeText(getApplicationContext(), "Infomation has been saved successfully", Toast.LENGTH_SHORT).show();
+
 
                 break;
             default:break;
@@ -120,4 +180,6 @@ public class SaveActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_actionbar_save, menu);
         return true;
     }
+
+
 }

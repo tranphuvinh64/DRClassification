@@ -9,13 +9,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <EditText
-            android:id="@+id/info_edittext_idform"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Form ID">
-        </EditText>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -69,6 +70,8 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
         Log.d("debug", "Here result activity");
         Image imageTest = (Image)getIntent().getParcelableExtra("imagetest");
+
+
         //convert to base64 string
         File file = new File("/storage/emulated/0/Download/63_left.jpg");
         FileInputStream imageInFile = null;
@@ -84,12 +87,16 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
             e.printStackTrace();
         }
 
+
         // Converting Image byte array into Base64 String
-        String encodedImage = Base64.encodeToString(imageData, Base64.DEFAULT);
+        String encodedImage = Base64.encodeToString(imageData, 0);
         //String imageDataString = Base64.encodeToString(imageData,Base64.DEFAULT);
         Log.d("encode string: ", encodedImage);
         Log.d("len of string: ", ""+encodedImage.length());
+
+        Toast.makeText(getApplicationContext(), "Image hase been classified", Toast.LENGTH_SHORT).show();
         imageView.setImageURI(Uri.parse(imageTest.getPath()));
+
         Log.d("recieved image type", imageTest.getClass().getName());
 
     }
@@ -112,7 +119,6 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
             default:break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -127,6 +133,8 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
             // gửi 1 tín hiệu cho biết chuyển từ màn hình result
 
             Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
+            intent.putExtra("Save As", CONSTANTS.SAVE_AS_MODE_NEW);
+            getIntent().getSerializableExtra("Save As");
             startActivity(intent);
         }
     }

@@ -23,9 +23,9 @@ public class Form implements Serializable {
 
 
     public Form() {
-        this.ID = this.today = this.name = this.dateOfBirth = this.sex = this.personalID = this.classificationResult= "";
-        this.bloodPressure_Diastolic= this.bloodPressure_Systolic= this.bloodSugar= this.hba1c= this.cholesterolHDL = this.cholesterolLDL ="" ;
-        this.image = this.medicalHistory= this.note = "" ;
+        this.ID = this.today = this.name = this.dateOfBirth = this.sex = this.personalID = this.classificationResult= "null";
+        this.bloodPressure_Diastolic= this.bloodPressure_Systolic= this.bloodSugar= this.hba1c= this.cholesterolHDL = this.cholesterolLDL ="null" ;
+        this.image = this.medicalHistory= this.note = "null" ;
     }
 
     public String getID() {

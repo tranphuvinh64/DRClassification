@@ -1,6 +1,7 @@
 package uit.vinh.kk;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -39,9 +40,11 @@ import uit.vinh.kk.Classifier.Recognition;
 //import org.tensorflow.lite.Interpreter;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener , Serializable {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Serializable {
+    static DatabaseHelper formDatabase ;
     ArrayList<DataModel> dataModels;
-    private static ArrayList<Form> listForm = loadXMLData("//storage//emulated//0//patientData");
+    //private static ArrayList<Form> listForm = loadXMLData("//storage//emulated//0//patientData");
+    private static ArrayList<Form> listForm;
     ListView listView;
     private static CustomAdapter adapter;
     private static String TAG = "debug";
@@ -69,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // temp
         rgbFrameBitmap = Bitmap.createBitmap(640,480,Bitmap.Config.ARGB_8888);
 
-        Log.d(TAG, "Load main activity");
 
         try {
             classifier = new Classifier(this);
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         //btnClassify = findViewById(R.id.btnClassify);
-        imgImport = findViewById(R.id.imgImport);
+        //imgImport = findViewById(R.id.imgImport);
 
 
 
@@ -110,16 +112,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         listView=findViewById(R.id.list);
         dataModels= new ArrayList<>();
 
+        // create database
+        formDatabase = new DatabaseHelper(this);
+        listForm = loadSQLiteData();
+
         for(int i = 0; i < listForm.size(); i++){
-            Log.d(TAG, i + " loadXMLData: " + listForm.get(i).toString());
+            // Log.d(TAG, i + " loadXMLData: " + listForm.get(i).toString());
             String tempname = listForm.get(i).getName();
             String tempidForm = listForm.get(i).getID();
             String tempmedhis = listForm.get(i).getMedicalHistory();
             String temppersonalid = listForm.get(i).getPersonalID();
             String tempdob = listForm.get(i).getDateOfBirth();
             String tempresult = listForm.get(i).getClassificationResult();
-
-            int len_secondline = Math.min((tempdob + " - " + tempmedhis).length(),45);
+            int len_secondline = Math.min((tempdob + " - " + tempmedhis).length(),CONSTANTS.MAX_LENGTH_STRING);
             dataModels.add(new DataModel(tempname,temppersonalid,tempidForm,(tempdob + " - " + tempmedhis).substring(0,len_secondline),tempresult));
 
         }
@@ -138,13 +143,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(selectedForm!=null){
                     Intent intent = new Intent(getApplicationContext(), DisplayPatientInfoActivity.class);
                     intent.putExtra("patientinfo", selectedForm);
-                    Log.d(TAG, "selected form: " + selectedForm.toString() );
                     getIntent().getSerializableExtra("patientinfo");
                     startActivity(intent);
                 }
             }
         });
+
+        loadSQLiteData();
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
@@ -153,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_actionbar_search, menu);
@@ -171,11 +179,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void animateFAB(){
         if(isOpen){
             floatingActionButtonNew.startAnimation(rotateBackward);
-
             browseImageLinearLayout.startAnimation(fabClose);
             infoLinearLayout.startAnimation(fabClose);
             //loadDataLinearLayout.startAnimation(fabClose);
-
             floatingActionButtonBrowse.setClickable(false);
             floatingActionButtonInfo.setClickable(false);
             isOpen = false;
@@ -183,14 +189,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else
         {
             floatingActionButtonNew.startAnimation(rotateForward);
-
             browseImageLinearLayout.startAnimation(fabOpen);
             infoLinearLayout.startAnimation(fabOpen);
             //loadDataLinearLayout.startAnimation(fabOpen);
-
             floatingActionButtonBrowse.setClickable(true);
             floatingActionButtonInfo.setClickable(true);
-
             isOpen = true;
         }
     }
@@ -202,12 +205,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        }
         if(v.getId() == R.id.browseimage_floating_action_button){
             ImagePicker.create(MainActivity.this).start();
+            animateFAB();
         }
         else if (v.getId() == R.id.info_floating_action_button){
-            Log.d("clicked", "onClick: info button Clicked");
+            animateFAB();
+//            Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+//                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//            startActivityForResult(pickPhoto , 1);//one can be replaced with any action code
+
+
+
+//            Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//            startActivityForResult(takePicture, 0);//zero can be replaced with any action code (called requestCode)
         }
         else if (v.getId() == R.id.floating_action_button){
             animateFAB();
+
         }
 
     }
@@ -372,6 +385,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
             Image images = ImagePicker.getFirstImageOrNull(data);
+
+
             // gửi ảnh qua result activity
             if (images!=null){
                 Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
@@ -460,4 +475,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        }
     }
 
+    private static ArrayList<Form> loadSQLiteData(){
+        Cursor res = formDatabase.loadData();
+        ArrayList<Form> listForm = new ArrayList<>();
+        if (res.getCount() != 0){
+            while(res.moveToNext()){
+                // để giá trị constant cho các cột, đọc vào dễ hiểu
+                Form showForm = new Form();
+                showForm.setID(res.getString(CONSTANTS.COLUMN_ID_INDEX));
+                showForm.setToday(res.getString(CONSTANTS.COLUMN_TODAY_INDEX));
+                showForm.setName(res.getString(CONSTANTS.COLUMN_PATIENT_NAME_INDEX));
+                showForm.setDateOfBirth(res.getString(CONSTANTS.COLUMN_DOB_INDEX));
+                showForm.setSex(res.getString(CONSTANTS.COLUMN_SEX_INDEX));
+                showForm.setPersonalID(res.getString(CONSTANTS.COLUMN_PERSONALID_INDEX));
+                showForm.setClassificationResult(res.getString(CONSTANTS.COLUMN_RESULT_INDEX));
+                showForm.setBloodPressure_Systolic(res.getString(CONSTANTS.COLUMN_SYSTOLIC_INDEX));
+                showForm.setBloodPressure_Diastolic(res.getString(CONSTANTS.COLUMN_DIASTOLIC_INDEX));
+                showForm.setBloodSugar(res.getString(CONSTANTS.COLUMN_BLOODSUGAR_INDEX));
+                showForm.setHba1c(res.getString(CONSTANTS.COLUMN_HBA1C_INDEX));
+                showForm.setCholesterolLDL(res.getString(CONSTANTS.COLUMN_CHOLESTEROL_LDL_INDEX));
+                showForm.setCholesterolHDL(res.getString(CONSTANTS.COLUMN_CHOLESTEROL_HDL_INDEX));
+                showForm.setMedicalHistory(res.getString(CONSTANTS.COLUMN_MEDICAL_HISTORY_INDEX));
+                showForm.setNote(res.getString(CONSTANTS.COLUMN_NOTE_INDEX));
+
+
+
+                listForm.add(showForm);
+                Log.d(TAG, "loadSQLite data: " + showForm.toString());
+            }
+        }
+        return listForm;
+    }
 }

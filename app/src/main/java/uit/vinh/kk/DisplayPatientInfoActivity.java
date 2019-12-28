@@ -40,7 +40,7 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // create components
-        edittext_idForm = findViewById(R.id.info_edittext_idform);
+        //edittext_idForm = findViewById(R.id.info_edittext_idform);
         edittext_today = findViewById(R.id.info_edittext_today);
         edittext_patientName = findViewById(R.id.info_edittext_fullname);
         edittext_dateOfBirth = findViewById(R.id.info_edittext_dob);
@@ -70,7 +70,7 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         Log.d("debug", "previous info: " + prevForm.getName());
         // không cho sửa khi đang view
 
-        edittext_idForm.setKeyListener(null);
+        //edittext_idForm.setKeyListener(null);
         edittext_today.setKeyListener(null);
         edittext_patientName.setKeyListener(null);
         edittext_dateOfBirth.setKeyListener(null);
@@ -90,7 +90,7 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         spinner_result.setEnabled(false);
         spinner_sex.setEnabled(false);
 
-        edittext_idForm.setText(prevForm.getID());
+        //edittext_idForm.setText(prevForm.getID());
         edittext_patientName.setText(prevForm.getName());
         edittext_today.setText(prevForm.getToday());
         edittext_dateOfBirth.setText(prevForm.getDateOfBirth());
@@ -120,10 +120,13 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
                 //backtoHomeScreen();
                 return true;
             case R.id.menu_edit:
-                // gửi thông tin để biết là lưu thông tin edit
-
-                // chuyển màn hình SaveActivity
+                // gửi tín hiệu để biết là lưu thông tin edit
+                Form prevForm = (Form)getIntent().getSerializableExtra("patientinfo");
                 Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
+                intent.putExtra("Save As", "OLD");
+                intent.putExtra("oldform", prevForm);
+                getIntent().getSerializableExtra("Save As");
+                // chuyển màn hình SaveActivity
                 startActivity(intent);
                 break;
             default:break;

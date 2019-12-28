@@ -2,7 +2,6 @@ package uit.vinh.kk;
 
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-
-import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnClickListener{
 
@@ -44,7 +41,6 @@ public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnCli
         int position=(Integer) v.getTag();
         Object object= getItem(position);
         DataModel dataModel=(DataModel)object;
-        Log.d(TAG, "Here1");
 
 //        switch (v.getId())
 //        {
