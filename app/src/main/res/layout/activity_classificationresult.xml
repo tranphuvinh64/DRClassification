@@ -31,8 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:text="level 0"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/detected_item_value"
@@ -101,7 +100,6 @@
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
-
             <TextView
                 android:id="@+id/detected_item3_value"
                 android:layout_width="match_parent"
@@ -143,6 +141,8 @@
             android:id="@+id/buttonSaveData"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/ef_white"
             android:text="Save" />
     </LinearLayout>
 

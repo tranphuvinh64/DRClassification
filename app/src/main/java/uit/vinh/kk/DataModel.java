@@ -7,12 +7,23 @@ public class DataModel {
     private String dateOfBirth;
     private String result;
 
-    public DataModel(String name, String personalID, String idForm, String dateOfBirth, String result) {
+    public String getStudyDate() {
+        return studyDate;
+    }
+
+    public void setStudyDate(String studyDate) {
+        this.studyDate = studyDate;
+    }
+
+    private String studyDate;
+
+    public DataModel(String name, String personalID, String idForm, String dateOfBirth, String result, String studyDate) {
         this.name = name;
         this.personalID = personalID;
         this.idForm = idForm;
         this.dateOfBirth = dateOfBirth;
         this.result = result;
+        this.studyDate = studyDate;
     }
 
     public DataModel() {
@@ -57,4 +68,6 @@ public class DataModel {
     public void setResult(String result) {
         this.result = result;
     }
+
+
 }

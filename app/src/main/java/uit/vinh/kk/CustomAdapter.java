@@ -24,6 +24,7 @@ public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnCli
         TextView Name;
         TextView dateOfBirth;
         TextView textViewResult;
+        TextView textViewStudyDate;
         ImageView imageViewResult;
 
     }
@@ -72,6 +73,7 @@ public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnCli
             viewHolder.personalID = convertView.findViewById(R.id.row_item_personalID);
             viewHolder.imageViewResult = convertView.findViewById((R.id.imageview_icon_result));
             viewHolder.textViewResult = convertView.findViewById(R.id.icon_text_result);
+            viewHolder.textViewStudyDate = convertView.findViewById(R.id.row_item_study_date);
 //            viewHolder.txtName = (TextView) convertView.findViewById(R.id.name);
 //            viewHolder.txtType = (TextView) convertView.findViewById(R.id.type);
 //            viewHolder.txtVersion = (TextView) convertView.findViewById(R.id.version_number);
@@ -91,6 +93,7 @@ public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnCli
         viewHolder.Name.setText(dataModel.getName());
         viewHolder.personalID.setText(dataModel.getPersonalID());
         viewHolder.dateOfBirth.setText(dataModel.getDateOfBirth());
+        viewHolder.textViewStudyDate.setText(dataModel.getStudyDate());
         if (dataModel.getResult().equals("No DR")){
             viewHolder.imageViewResult.setImageResource(R.drawable.bg_circle_nodr);
             viewHolder.textViewResult.setText("N");

@@ -1,6 +1,11 @@
 package uit.vinh.kk;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Locale;
 
 public class Form implements Serializable {
     private String ID;
@@ -177,4 +182,22 @@ public class Form implements Serializable {
                 ", note='" + note + '\'' +
                 '}';
     }
+
+    public static Comparator<Form> CountDate = new Comparator<Form>() {
+        @Override
+        public int compare(Form o1, Form o2) {
+            String date1 = o1.getToday();
+            String date2 = o2.getToday();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+            try {
+                Date date1_paresd = sdf.parse(date1);
+                Date date2_parsed = sdf.parse(date2);
+                long deviation = date2_parsed.getTime()/86400000 - date1_paresd.getTime()/86400000;
+                return (int) (deviation);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return 0;
+        }
+    };
 }

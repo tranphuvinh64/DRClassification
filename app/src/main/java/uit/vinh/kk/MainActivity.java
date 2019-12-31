@@ -1,10 +1,17 @@
 package uit.vinh.kk;
 
+import android.Manifest;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,31 +27,33 @@ import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
-
-import uit.vinh.kk.Classifier.Recognition;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Locale;
 //import org.tensorflow.lite.Interpreter;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Serializable {
+    // for permission requests
+    public static final int REQUEST_PERMISSION = 300;
+    // request code for permission requests to the os for image
+    public static final int REQUEST_IMAGE = 100;
+    // will hold uri of image obtained from camera
+    private Uri imageUri;
     static DatabaseHelper formDatabase ;
     ArrayList<DataModel> dataModels;
     //private static ArrayList<Form> listForm = loadXMLData("//storage//emulated//0//patientData");
@@ -56,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout browseImageLinearLayout, infoLinearLayout, useCameraLinearLayout;
     FrameLayout mainLayout;
     View blurView;
-    FloatingActionButton floatingActionButtonNew, floatingActionButtonBrowse, floatingActionButtonInfo;
+    FloatingActionButton floatingActionButtonNew, floatingActionButtonBrowse, floatingActionButtonInfo, floatinngActionButtonUseCamera;
     Animation fabOpen, fabClose, rotateBackward, rotateForward;
     boolean isOpen = false;
     private static final int RC_CAMERA = 3000;
@@ -75,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // initial components
+        setContentView(R.layout.activity_main);
         // temp
         rgbFrameBitmap = Bitmap.createBitmap(640,480,Bitmap.Config.ARGB_8888);
 
@@ -84,9 +95,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // initial components
-        setContentView(R.layout.activity_main);
 
         //getSupportActionBar().hide();
         browseImageLinearLayout = findViewById(R.id.browseimage_linear_layout);
@@ -102,12 +110,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         floatingActionButtonNew =findViewById(R.id.floating_action_button);
         floatingActionButtonBrowse = findViewById(R.id.browseimage_floating_action_button);
         floatingActionButtonInfo = findViewById(R.id.info_floating_action_button);
+        floatinngActionButtonUseCamera = findViewById(R.id.usecamera_floating_action_button );
 
 
         // set action listener
         floatingActionButtonNew.setOnClickListener(this);
         floatingActionButtonBrowse.setOnClickListener(this);
         floatingActionButtonInfo.setOnClickListener(this);
+        floatinngActionButtonUseCamera.setOnClickListener(this);
 
 
         fabOpen = AnimationUtils.loadAnimation(this,R.anim.fab_open);
@@ -126,13 +136,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for(int i = 0; i < listForm.size(); i++){
             // Log.d(TAG, i + " loadXMLData: " + listForm.get(i).toString());
             String tempname = listForm.get(i).getName();
+            // xử lý chuỗi khi tên quá dài
+            if (tempname.length() > CONSTANTS.MAX_LENGTH_FIRST_STRING ){
+                tempname = tempname.substring(tempname.length() - CONSTANTS.MAX_LENGTH_FIRST_STRING);
+            }
             String tempidForm = listForm.get(i).getID();
             String tempmedhis = listForm.get(i).getMedicalHistory();
             String temppersonalid = listForm.get(i).getPersonalID();
             String tempdob = listForm.get(i).getDateOfBirth();
             String tempresult = listForm.get(i).getClassificationResult();
-            int len_secondline = Math.min((tempdob + " - " + tempmedhis).length(),CONSTANTS.MAX_LENGTH_STRING);
-            dataModels.add(new DataModel(tempname,temppersonalid,tempidForm,(tempdob + " - " + tempmedhis).substring(0,len_secondline),tempresult));
+            String tempStudyDate = listForm.get(i).getToday();
+            tempStudyDate = stringView(tempStudyDate);
+
+            int len_secondline = Math.min(tempmedhis.length(),CONSTANTS.MAX_LENGTH_THIRD_STRING);
+            dataModels.add(new DataModel(tempname,tempdob + " - " + temppersonalid,tempidForm,tempmedhis.substring(0,len_secondline),tempresult, tempStudyDate));
         }
 
         adapter= new CustomAdapter(dataModels,getApplicationContext());
@@ -153,22 +170,84 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
-        //loadSQLiteData();
     }
 
+    private String stringView (String studyDate){
+        // xử lý hiển thị ngày tháng
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+        String currentDate = sdf.format(new Date());
+        try {
+            Date today_parsed = sdf.parse(currentDate);
+            Date studydate_parsed = sdf.parse(studyDate);
+            long deviation = today_parsed.getTime()/86400000 - studydate_parsed.getTime()/86400000;
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == R.id.menu_search){
-            Log.d(TAG, "icon search clicked");
-
-            //setSupportActionBar(actionbar);
-
-            getSupportActionBar().hide();
+            if ( deviation == 0){
+                studyDate = "Today";
+            }
+            else if (deviation == 1){
+                studyDate = "Yesterday";
+            }
+            else if (deviation > 1 && deviation < 7){
+                studyDate = deviation + " days ago";
+            }
+            else{
+                String[] splitToday = currentDate.split("/");
+                String[] splitStudyDate = studyDate.split("/");
+                studyDate = handleSplitDMYString(splitToday, splitStudyDate);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        return super.onOptionsItemSelected(item);
+        return studyDate;
     }
-
+    private String handleSplitDMYString (String[] today, String[] studyDate){
+        String finalString = "N/A";
+        if (today[0].equals(studyDate[0])){
+            switch (studyDate[1]){
+                case "01":
+                    finalString = "Jan " + studyDate[2];
+                    break;
+                case "02":
+                    finalString = "Feb " + studyDate[2];
+                    break;
+                case "03":
+                    finalString = "Mar " + studyDate[2];
+                    break;
+                case "04":
+                    finalString = "Apr " + studyDate[2];
+                    break;
+                case "05":
+                    finalString = "May " + studyDate[2];
+                    break;
+                case "06":
+                    finalString = "Jun " + studyDate[2];
+                    break;
+                case "07":
+                    finalString = "Jul " + studyDate[2];
+                    break;
+                case "08":
+                    finalString = "Aug " + studyDate[2];
+                    break;
+                case "09":
+                    finalString = "Sep " + studyDate[2];
+                    break;
+                case "10":
+                    finalString = "Oct " + studyDate[2];
+                    break;
+                case "11":
+                    finalString = "Nov " + studyDate[2];
+                    break;
+                case "12":
+                    finalString = "Dec " + studyDate[2];
+                    break;
+            }
+        }
+        else {
+            finalString = studyDate[0] + "/" + studyDate[1] + "/" + studyDate[2];
+        }
+        return finalString;
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_actionbar_search, menu);
@@ -217,7 +296,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             View v = findViewById( R.id.shadowView);
             v.setVisibility(View.GONE);
             listView.setEnabled(true);
-            Log.d(TAG, "animateFAB: set clickable 1");
             isOpen = false;
         }
         else
@@ -232,212 +310,86 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             View v = findViewById( R.id.shadowView);
             v.setVisibility(View.VISIBLE);
             listView.setEnabled(false);
-            Log.d(TAG, "animateFAB: set clickable 2");
             isOpen = true;
         }
     }
 
     @Override
     public void onClick(View v){
-//        if(v.getId() == R.id.btnClassify){
-//            processImage();
-//        }
         if(v.getId() == R.id.browseimage_floating_action_button){
             ImagePicker.create(MainActivity.this).start();
             animateFAB();
         }
         else if (v.getId() == R.id.info_floating_action_button){
             animateFAB();
-//            Intent pickPhoto = new Intent(Intent.ACTION_PICK,
-//                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//            startActivityForResult(pickPhoto , 1);//one can be replaced with any action code
-
-
-
-//            Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//            startActivityForResult(takePicture, 0);//zero can be replaced with any action code (called requestCode)
         }
         else if (v.getId() == R.id.floating_action_button){
             animateFAB();
         }
         else if (v.getId() == R.id.shadowView){
-            Log.d(TAG, "onClick: main layout clicked");
             animateFAB();
         }
-
-
-    }
-
-
-    private static ArrayList<Form> loadXMLData(String pathFile){
-        ArrayList<String> userData = new ArrayList<String>();
-        ArrayList<Form> listForm = new ArrayList<Form>();
-        FileInputStream fis = null;
-        try {
-            // fis = getApplicationContext().openFileInput(xmlpathFile);
-            fis = new FileInputStream(new File(pathFile));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        InputStreamReader isr = new InputStreamReader(fis);
-
-        char[] inputBuffer = new char[0];
-        try {
-            inputBuffer = new char[fis.available()];
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            isr.read(inputBuffer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String data = new String(inputBuffer);
-        try {
-            isr.close();
-            fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        XmlPullParserFactory factory = null;
-        try {
-            factory = XmlPullParserFactory.newInstance();
-        }
-        catch (XmlPullParserException e2) {
-            // TODO Auto-generated catch block
-            e2.printStackTrace();
-        }
-        factory.setNamespaceAware(true);
-        XmlPullParser xpp = null;
-        try {
-            xpp = factory.newPullParser();
-        }
-        catch (XmlPullParserException e2) {
-            // TODO Auto-generated catch block
-            e2.printStackTrace();
-        }
-        try {
-            xpp.setInput(new StringReader(data));
-        }
-        catch (XmlPullParserException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-
-        int eventType = 0;
-        try {
-            eventType = xpp.getEventType();
-        }
-        catch (XmlPullParserException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        Form newForm = null;
-        while (eventType != XmlPullParser.END_DOCUMENT){
-            if (xpp.getName() != null && xpp.getName().equals("patient")){
-
-                Log.d(TAG, "here 1");
-                if(eventType == XmlPullParser.START_TAG){
-                    newForm = new Form();
-                }
-                else if (eventType == XmlPullParser.END_TAG){
-                    listForm.add(newForm);
-                    newForm = null;
-                }
+        else if(v.getId() == R.id.usecamera_floating_action_button ){
+            animateFAB();
+            // request permission to use the camera on the user's phone
+            if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, REQUEST_PERMISSION);
             }
-            else if(eventType == XmlPullParser.START_TAG)
-            {
-                String tagName = xpp.getName();
-                Log.d(TAG, "tagName==" + tagName);
-                try {
-                    eventType = xpp.next();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                }
-                if(eventType == XmlPullParser.TEXT){
-                    switch (tagName){
-                        case "ID":
-                            newForm.setID(xpp.getText());
-                            break;
-                        case "today":
-                            newForm.setToday(xpp.getText());
-                            break;
-                        case "name":
-                            newForm.setName(xpp.getText());
-                            break;
-                        case "dob":
-                            newForm.setDateOfBirth(xpp.getText());
-                            break;
-                        case "sex":
-                            newForm.setSex(xpp.getText());
-                            break;
-                        case "personalID":
-                            newForm.setPersonalID(xpp.getText());
-                            break;
-                        case "result":
-                            newForm.setClassificationResult(xpp.getText());
-                            break;
-                        case "systolic":
-                            newForm.setBloodPressure_Systolic(xpp.getText());
-                            break;
-                        case "diastolic":
-                            newForm.setBloodPressure_Diastolic(xpp.getText());
-                            break;
-                        case "sugar":
-                            newForm.setBloodSugar(xpp.getText());
-                            break;
-                        case "hba1c":
-                            newForm.setHba1c(xpp.getText());
-                            break;
-                        case "medhis":
-                            newForm.setMedicalHistory(xpp.getText());
-                            break;
-                        case "note":
-                            newForm.setNote(xpp.getText());
-                            break;
-                        case "hdl":
-                            newForm.setCholesterolHDL(xpp.getText());
-                            break;
-                        case "ldl":
-                            newForm.setCholesterolLDL(xpp.getText());
-                            break;
-//                        case "image":  // mở khi xử lý chỉn chu, vì string rất dàu
-//                            newForm.setImage(xpp.getText());
-//                            break;
-                    }
-                }
+
+            // request permission to write data (aka images) to the user's external storage of their phone
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_PERMISSION);
             }
-            try {
-                eventType = xpp.next();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
+
+            // request permission to read data (aka images) from the user's external storage of their phone
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_PERMISSION);
             }
+            Log.d(TAG, "onClick: Used camera");
+            // Open Camera
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+                // tell camera where to store the resulting picture
+                imageUri = getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                // start camera, and wait for it to finish
+                startActivityForResult(intent, REQUEST_IMAGE);
         }
-        return listForm;
+        
     }
 
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
+        // result of using camera
+        if (resultCode == RESULT_OK){
+            Uri source_uri = imageUri;
+            Intent i = new Intent(getApplicationContext(), ResultActivity.class);
+            // put image data in extras to send
+            i.putExtra("resID_uri", imageUri);
+            // send other required data
+            startActivity(i);
+        }
+
+
+
+        // result of browsing image from gallery
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
             Image images = ImagePicker.getFirstImageOrNull(data);
-
-
             // gửi ảnh qua result activity
             if (images!=null){
                 Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
                 intent.putExtra("imagetest", images);
-                getIntent().getSerializableExtra("imagetest");
+                //getIntent().getSerializableExtra("imagetest");
                 startActivity(intent);
             }
-
             Log.i("IMAGE",images.getPath());
             Log.d(TAG, images.getClass().getName());
             //imgImport.setImageURI(Uri.parse(images.getPath()));
@@ -454,70 +406,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-    protected void processImage() {
-//        // rgbFrameBitmap.setPixels(getRgbBytes(), 0, previewWidth, 0, 0, previewWidth, previewHeight);
-//        if (rgbFrameBitmap == null ){
-//            Log.d("debug", "bitmap null");
-//        }
-//        else {
-//            Log.d("debug", "bitmap not null");
-//            Log.d("width:",String.valueOf(rgbFrameBitmap.getWidth()) );
-//            Log.d("height:",String.valueOf(rgbFrameBitmap.getHeight()));
-//        }
-//
-//        if (classifier == null){
-//            Log.d("debug", "classifier null");
-//        }
-//        final List<Classifier.Recognition> results =
-//                classifier.recognizeImage(rgbFrameBitmap, sensorOrientation);
-//        //showResultsInBottomSheet(results);
-    }
-
-    protected void showResultsInBottomSheet(List<Recognition> results) {
-//        if (results != null && results.size() >= 5) {
-//            Recognition recognition = results.get(0);
-//            if (recognition != null) {
-//                if (recognition.getTitle() != null) recognitionTextView.setText(recognition.getTitle());
-//                if (recognition.getConfidence() != null)
-//                    recognitionValueTextView.setText(
-//                            String.format("%.2f", (100 * recognition.getConfidence())) + "%");
-//            }
-//
-//            Recognition recognition1 = results.get(1);
-//            if (recognition1 != null) {
-//                if (recognition1.getTitle() != null) recognition1TextView.setText(recognition1.getTitle());
-//                if (recognition1.getConfidence() != null)
-//                    recognition1ValueTextView.setText(
-//                            String.format("%.2f", (100 * recognition1.getConfidence())) + "%");
-//            }
-//
-//            Recognition recognition2 = results.get(2);
-//            if (recognition2 != null) {
-//                if (recognition2.getTitle() != null) recognition2TextView.setText(recognition2.getTitle());
-//                if (recognition2.getConfidence() != null)
-//                    recognition2ValueTextView.setText(
-//                            String.format("%.2f", (100 * recognition2.getConfidence())) + "%");
-//            }
-//
-//            Recognition recognition3 = results.get(3);
-//            if (recognition3 != null) {
-//                if (recognition3.getTitle() != null) recognition3TextView.setText(recognition3.getTitle());
-//                if (recognition3.getConfidence() != null)
-//                    recognition3ValueTextView.setText(
-//                            String.format("%.2f", (100 * recognition3.getConfidence())) + "%");
-//            }
-//
-//            Recognition recognition4 = results.get(4);
-//            if (recognition4 != null) {
-//                if (recognition4.getTitle() != null) recognition4TextView.setText(recognition4.getTitle());
-//                if (recognition4.getConfidence() != null)
-//                    recognition4ValueTextView.setText(
-//                            String.format("%.2f", (100 * recognition4.getConfidence())) + "%");
-//            }
-//        }
-    }
-
     private static ArrayList<Form> loadSQLiteData(){
         Cursor res = formDatabase.loadData();
         ArrayList<Form> listForm = new ArrayList<>();
@@ -540,13 +428,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 showForm.setCholesterolHDL(res.getString(CONSTANTS.COLUMN_CHOLESTEROL_HDL_INDEX));
                 showForm.setMedicalHistory(res.getString(CONSTANTS.COLUMN_MEDICAL_HISTORY_INDEX));
                 showForm.setNote(res.getString(CONSTANTS.COLUMN_NOTE_INDEX));
-
-
-
                 listForm.add(showForm);
                 Log.d(TAG, "loadSQLite data: " + showForm.toString());
             }
         }
+        Collections.sort(listForm,Form.CountDate);
         return listForm;
     }
 }

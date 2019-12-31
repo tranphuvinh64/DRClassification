@@ -124,8 +124,6 @@ public class Classifier {
         // Creates the post processor for the output probability.
         probabilityProcessor = new TensorProcessor.Builder().add(getPostprocessNormalizeOp()).build();
 
-        LOGGER.d("Created a Tensorflow Lite Image Classifier.");
-
     }
 
     protected TensorOperator getPreprocessNormalizeOp() {

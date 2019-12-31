@@ -8,7 +8,8 @@
     <RelativeLayout
         android:id="@+id/icon_back"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
 
         <ImageView
             android:id="@+id/imageview_icon_result"
@@ -41,19 +42,26 @@
             android:layout_alignParentTop="true"
             android:text="Trần Văn ABCEFGH"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:textSize="18dp"/>
+        <TextView
+            android:id="@+id/row_item_study_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Study date"
+            android:layout_marginLeft="220dp"/>
         <TextView
             android:id="@+id/row_item_DoB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ngày tháng năm sinh"
-            android:layout_marginTop="20dp" />
+            android:text="Bệnh sử bệnh án"
+            android:layout_marginTop="45dp" />
         <TextView
             android:id="@+id/row_item_personalID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SốCMND12345678"
-            android:layout_marginLeft="200dp"/>
+            android:text="Ngày tháng năm sinh - CMND"
+            android:layout_marginTop="25dp"/>
     </RelativeLayout>
 
 
