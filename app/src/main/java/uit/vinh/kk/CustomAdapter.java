@@ -12,12 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnClickListener{
 
     private ArrayList<DataModel> dataSet;
     Context mContext;
-
+    private  List<DataModel> modelList;
     // View lookup cache
     private static class ViewHolder {
         TextView personalID;
@@ -29,11 +31,12 @@ public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnCli
 
     }
 
-    public CustomAdapter(ArrayList<DataModel> data, Context context) {
-        super(context, R.layout.base_row_item, data);
-        this.dataSet = data;
+    public CustomAdapter(List<DataModel> modellist, Context context) {
+        super(context, R.layout.base_row_item, modellist);
+        this.modelList = modellist;
         this.mContext=context;
-
+        this.dataSet = new ArrayList<DataModel>();
+        this.dataSet.addAll(modellist);
     }
 
     @Override
@@ -74,11 +77,6 @@ public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnCli
             viewHolder.imageViewResult = convertView.findViewById((R.id.imageview_icon_result));
             viewHolder.textViewResult = convertView.findViewById(R.id.icon_text_result);
             viewHolder.textViewStudyDate = convertView.findViewById(R.id.row_item_study_date);
-//            viewHolder.txtName = (TextView) convertView.findViewById(R.id.name);
-//            viewHolder.txtType = (TextView) convertView.findViewById(R.id.type);
-//            viewHolder.txtVersion = (TextView) convertView.findViewById(R.id.version_number);
-//            viewHolder.info = (ImageView) convertView.findViewById(R.id.item_info);
-
             result=convertView;
 
             convertView.setTag(viewHolder);
@@ -114,12 +112,24 @@ public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnCli
             viewHolder.imageViewResult.setImageResource(R.drawable.bg_circle_proliferative);
             viewHolder.textViewResult.setText("P");
         }
-//        viewHolder.txtName.setText(dataModel.getName());
-//        viewHolder.txtType.setText(dataModel.getType());
-//        viewHolder.txtVersion.setText(dataModel.getVersion_number());
-//        viewHolder.info.setOnClickListener(this);
-//        viewHolder.info.setTag(position);
         // Return the completed view to render on screen
         return convertView;
+    }
+
+    public void filter(String key){
+        key = key.toLowerCase(Locale.getDefault());
+        modelList.clear();
+        if(key.length() == 0){
+            modelList.addAll(dataSet);
+        }
+        else{
+            for (DataModel model: dataSet){
+                if(model.getName().toLowerCase(Locale.getDefault()).contains(key)
+                        || model.getPersonalID().toLowerCase(Locale.getDefault()).contains(key)){
+                    modelList.add(model);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 }

@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,8 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.esafirm.imagepicker.model.Image;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -82,73 +79,44 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         recognition3TextView.setText("Level 3");
         recognition4TextView.setText("Level 4");
 
-
-//        Toolbar toolbar = findViewById(R.id.displaypatientinfo);
-//
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        Drawable drawable= getResources().getDrawable(android.R.drawable.ic_menu_search);
-//        getSupportActionBar().setHomeAsUpIndicator(drawable);
-
-        Image imageTest = (Image)getIntent().getParcelableExtra("imagetest");
-        //Log.d("debug", "imageTest.getPath() = " + imageTest.getPath());
-
-        //convert to base64 string
-//        File file = new File("/storage/emulated/0/Download/63_left.jpg");
-//        FileInputStream imageInFile = null;
-//        try {
-//            imageInFile = new FileInputStream(file);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        byte imageData[] = new byte[(int) file.length()];
-//        try {
-//            imageInFile.read(imageData);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        // Converting Image byte array into Base64 String
-//        String encodedImage = Base64.encodeToString(imageData, 0);
-//        //String imageDataString = Base64.encodeToString(imageData,Base64.DEFAULT);
-//        Log.d("encode string: ", encodedImage);
-//        Log.d("len of string: ", ""+encodedImage.length());
-
-        //Toast.makeText(getApplicationContext(), "Image hase been classified", Toast.LENGTH_SHORT).show();
-
-        imageView.setImageURI(Uri.parse(imageTest.getPath()));
-        //Log.d("recieved image type", imageTest.getClass().getName());
+        Uri uri = (Uri)getIntent().getParcelableExtra("imageURI");
+        imageView.setImageURI(uri);
 
         // put function classify here
         Classify();
-        //ClassifyCam();
 
     }
-    private void ClassifyCam(){
-        // get image from camera
-        // get image from previous activity to show in the imageView
-        Uri uri = (Uri)getIntent().getParcelableExtra("resID_uri");
-        try {
-            Bitmap bitmap_orig = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-            final List<Classifier.Recognition> results =
-                    classifier.recognizeImage(bitmap_orig, sensorOrientation);
-            Log.d("classify result", results.get(0).toString() + results.get(1).toString() + results.get(2).toString() + results.get(3).toString() + results.get(4).toString());
-            showResultsInBottomSheet(results);
-        } catch (IOException e) {
-            e.printStackTrace();
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_back_menuitem, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                ResultActivity.super.onBackPressed();
+                return true;
+            default:break;
         }
+        return super.onOptionsItemSelected(item);
     }
-    private void Classify(){
-        // get current bitmap from imageView
-        Bitmap bitmap_orig = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
 
-        // convert bitmap to byte array
-        convertBitmapToByteBuffer(bitmap_orig);
-        final List<Classifier.Recognition> results =
-                classifier.recognizeImage(bitmap_orig, sensorOrientation);
-        Log.d("classify result", results.get(0).toString() + results.get(1).toString() + results.get(2).toString() + results.get(3).toString() + results.get(4).toString());
-        showResultsInBottomSheet(results);
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.buttonSaveData){
+            // gửi 1 tín hiệu cho biết chuyển từ màn hình result
+
+            Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
+            intent.putExtra("Save As", CONSTANTS.SAVE_AS_MODE_NEW);
+            getIntent().getSerializableExtra("Save As");
+            startActivity(intent);
+        }
     }
 
     // converts bitmap to byte array which is passed in the tflite graph
@@ -178,38 +146,17 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_back_menuitem, menu);
-        //getMenuInflater().inflate(R.menu.menu_back_forward, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
-            case android.R.id.home:
-                ResultActivity.super.onBackPressed();
-                //backtoHomeScreen();
-                return true;
+    private void Classify(){
+        // get current bitmap from imageView
+        Bitmap bitmap_orig = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
 
-            default:break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
-    public void onClick(View v) {
-        if(v.getId() == R.id.buttonSaveData){
-            // gửi 1 tín hiệu cho biết chuyển từ màn hình result
-
-            Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
-            intent.putExtra("Save As", CONSTANTS.SAVE_AS_MODE_NEW);
-            getIntent().getSerializableExtra("Save As");
-            startActivity(intent);
-        }
+        // convert bitmap to byte array
+        convertBitmapToByteBuffer(bitmap_orig);
+        final List<Classifier.Recognition> results =
+                classifier.recognizeImage(bitmap_orig, sensorOrientation);
+        Log.d("classify result", results.get(0).toString() + results.get(1).toString() + results.get(2).toString() + results.get(3).toString() + results.get(4).toString());
+        showResultsInBottomSheet(results);
     }
 
     protected void showResultsInBottomSheet(List<Classifier.Recognition> results) {

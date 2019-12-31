@@ -7,11 +7,11 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // will hold uri of image obtained from camera
     private Uri imageUri;
     static DatabaseHelper formDatabase ;
-    ArrayList<DataModel> dataModels;
+
     //private static ArrayList<Form> listForm = loadXMLData("//storage//emulated//0//patientData");
     private static ArrayList<Form> listForm;
     ListView listView;
@@ -127,30 +128,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         listView=findViewById(R.id.list);
-        dataModels= new ArrayList<>();
+
 
         // create database
         formDatabase = new DatabaseHelper(this);
+
         listForm = loadSQLiteData();
-
-        for(int i = 0; i < listForm.size(); i++){
-            // Log.d(TAG, i + " loadXMLData: " + listForm.get(i).toString());
-            String tempname = listForm.get(i).getName();
-            // xử lý chuỗi khi tên quá dài
-            if (tempname.length() > CONSTANTS.MAX_LENGTH_FIRST_STRING ){
-                tempname = tempname.substring(tempname.length() - CONSTANTS.MAX_LENGTH_FIRST_STRING);
-            }
-            String tempidForm = listForm.get(i).getID();
-            String tempmedhis = listForm.get(i).getMedicalHistory();
-            String temppersonalid = listForm.get(i).getPersonalID();
-            String tempdob = listForm.get(i).getDateOfBirth();
-            String tempresult = listForm.get(i).getClassificationResult();
-            String tempStudyDate = listForm.get(i).getToday();
-            tempStudyDate = stringView(tempStudyDate);
-
-            int len_secondline = Math.min(tempmedhis.length(),CONSTANTS.MAX_LENGTH_THIRD_STRING);
-            dataModels.add(new DataModel(tempname,tempdob + " - " + temppersonalid,tempidForm,tempmedhis.substring(0,len_secondline),tempresult, tempStudyDate));
-        }
+        ArrayList<DataModel> dataModels = GetDataModel(listForm);
 
         adapter= new CustomAdapter(dataModels,getApplicationContext());
         listView.setAdapter(adapter);
@@ -172,82 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    private String stringView (String studyDate){
-        // xử lý hiển thị ngày tháng
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
-        String currentDate = sdf.format(new Date());
-        try {
-            Date today_parsed = sdf.parse(currentDate);
-            Date studydate_parsed = sdf.parse(studyDate);
-            long deviation = today_parsed.getTime()/86400000 - studydate_parsed.getTime()/86400000;
 
-            if ( deviation == 0){
-                studyDate = "Today";
-            }
-            else if (deviation == 1){
-                studyDate = "Yesterday";
-            }
-            else if (deviation > 1 && deviation < 7){
-                studyDate = deviation + " days ago";
-            }
-            else{
-                String[] splitToday = currentDate.split("/");
-                String[] splitStudyDate = studyDate.split("/");
-                studyDate = handleSplitDMYString(splitToday, splitStudyDate);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return studyDate;
-    }
-    private String handleSplitDMYString (String[] today, String[] studyDate){
-        String finalString = "N/A";
-        if (today[0].equals(studyDate[0])){
-            switch (studyDate[1]){
-                case "01":
-                    finalString = "Jan " + studyDate[2];
-                    break;
-                case "02":
-                    finalString = "Feb " + studyDate[2];
-                    break;
-                case "03":
-                    finalString = "Mar " + studyDate[2];
-                    break;
-                case "04":
-                    finalString = "Apr " + studyDate[2];
-                    break;
-                case "05":
-                    finalString = "May " + studyDate[2];
-                    break;
-                case "06":
-                    finalString = "Jun " + studyDate[2];
-                    break;
-                case "07":
-                    finalString = "Jul " + studyDate[2];
-                    break;
-                case "08":
-                    finalString = "Aug " + studyDate[2];
-                    break;
-                case "09":
-                    finalString = "Sep " + studyDate[2];
-                    break;
-                case "10":
-                    finalString = "Oct " + studyDate[2];
-                    break;
-                case "11":
-                    finalString = "Nov " + studyDate[2];
-                    break;
-                case "12":
-                    finalString = "Dec " + studyDate[2];
-                    break;
-            }
-        }
-        else {
-            finalString = studyDate[0] + "/" + studyDate[1] + "/" + studyDate[2];
-        }
-        return finalString;
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_actionbar_search, menu);
@@ -268,50 +177,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
-                return false;
+                if(TextUtils.isEmpty(newText)){
+                    adapter.filter(newText);
+                    listView.clearTextFilter();
+                }
+                else{
+                    adapter.filter(newText);
+                }
+                return true;
             }
         });
         return true;
-    }
-
-    private Form findFormByID(String idForm){
-        for(int i = 0; i < listForm.size(); i++){
-            if(listForm.get(i).getID() == idForm){
-                return listForm.get(i);
-            }
-        }
-        return null;
-    }
-
-    private void animateFAB(){
-        if(isOpen){
-            floatingActionButtonNew.startAnimation(rotateBackward);
-            browseImageLinearLayout.startAnimation(fabClose);
-            useCameraLinearLayout.startAnimation(fabClose);
-            infoLinearLayout.startAnimation(fabClose);
-            //loadDataLinearLayout.startAnimation(fabClose);
-            floatingActionButtonBrowse.setClickable(false);
-            floatingActionButtonInfo.setClickable(false);
-            View v = findViewById( R.id.shadowView);
-            v.setVisibility(View.GONE);
-            listView.setEnabled(true);
-            isOpen = false;
-        }
-        else
-        {
-            floatingActionButtonNew.startAnimation(rotateForward);
-            browseImageLinearLayout.startAnimation(fabOpen);
-            useCameraLinearLayout.startAnimation(fabOpen);
-            infoLinearLayout.startAnimation(fabOpen);
-            //loadDataLinearLayout.startAnimation(fabOpen);
-            floatingActionButtonBrowse.setClickable(true);
-            floatingActionButtonInfo.setClickable(true);
-            View v = findViewById( R.id.shadowView);
-            v.setVisibility(View.VISIBLE);
-            listView.setEnabled(false);
-            isOpen = true;
-        }
     }
 
     @Override
@@ -368,50 +244,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
-        // result of using camera
-        if (resultCode == RESULT_OK){
-            Uri source_uri = imageUri;
-            Intent i = new Intent(getApplicationContext(), ResultActivity.class);
-            // put image data in extras to send
-            i.putExtra("resID_uri", imageUri);
-            // send other required data
-            startActivity(i);
-        }
-
-
-
-        // result of browsing image from gallery
-        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
+        if (ImagePicker.shouldHandle(requestCode, resultCode, data) == true || resultCode == RESULT_OK){
             Image images = ImagePicker.getFirstImageOrNull(data);
-            // gửi ảnh qua result activity
-            if (images!=null){
+            if (images != null){
+                imageUri = Uri.parse(images.getPath());
+            }
+            if(imageUri!=null){
                 Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
-                intent.putExtra("imagetest", images);
-                //getIntent().getSerializableExtra("imagetest");
+                intent.putExtra("imageURI", imageUri);
                 startActivity(intent);
             }
-            Log.i("IMAGE",images.getPath());
-            Log.d(TAG, images.getClass().getName());
-            //imgImport.setImageURI(Uri.parse(images.getPath()));
-
-            BitmapFactory.Options optionstemp = new BitmapFactory.Options();
-            optionstemp.inPreferredConfig = Bitmap.Config.ARGB_4444;
-            rgbFrameBitmap = BitmapFactory.decodeFile(images.getPath(), optionstemp);
-            if (rgbFrameBitmap == null ){
-                Log.d("debug", "bitmap null");
+            else{
+                Toast.makeText(MainActivity.this,"No image found", Toast.LENGTH_SHORT);
             }
-            Log.d("debug", "converted bitmap");
-            Log.d("image type", rgbFrameBitmap.getClass().getName());
-            return;
+
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+
     private static ArrayList<Form> loadSQLiteData(){
         Cursor res = formDatabase.loadData();
         ArrayList<Form> listForm = new ArrayList<>();
         if (res.getCount() != 0){
             while(res.moveToNext()){
-                // để giá trị constant cho các cột, đọc vào dễ hiểu
                 Form showForm = new Form();
                 showForm.setID(res.getString(CONSTANTS.COLUMN_ID_INDEX));
                 showForm.setToday(res.getString(CONSTANTS.COLUMN_TODAY_INDEX));
@@ -432,7 +288,146 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d(TAG, "loadSQLite data: " + showForm.toString());
             }
         }
-        Collections.sort(listForm,Form.CountDate);
+        Collections.sort(listForm, Form.CountDate);
         return listForm;
+    }
+
+    private void animateFAB(){
+        if(isOpen){
+            floatingActionButtonNew.startAnimation(rotateBackward);
+            browseImageLinearLayout.startAnimation(fabClose);
+            useCameraLinearLayout.startAnimation(fabClose);
+            infoLinearLayout.startAnimation(fabClose);
+            floatingActionButtonBrowse.setClickable(false);
+            floatingActionButtonInfo.setClickable(false);
+            View v = findViewById( R.id.shadowView);
+            v.setVisibility(View.GONE);
+            listView.setEnabled(true);
+            isOpen = false;
+        }
+        else
+        {
+            floatingActionButtonNew.startAnimation(rotateForward);
+            browseImageLinearLayout.startAnimation(fabOpen);
+            useCameraLinearLayout.startAnimation(fabOpen);
+            infoLinearLayout.startAnimation(fabOpen);
+            floatingActionButtonBrowse.setClickable(true);
+            floatingActionButtonInfo.setClickable(true);
+            View v = findViewById( R.id.shadowView);
+            v.setVisibility(View.VISIBLE);
+            listView.setEnabled(false);
+            isOpen = true;
+        }
+    }
+
+    private Form findFormByID(String idForm){
+        for(int i = 0; i < listForm.size(); i++){
+            if(listForm.get(i).getID() == idForm){
+                return listForm.get(i);
+            }
+        }
+        return null;
+    }
+
+    private String dateView (String studyDate){
+        // xử lý hiển thị ngày tháng
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+        String currentDate = sdf.format(new Date());
+        try {
+            Date today_parsed = sdf.parse(currentDate);
+            Date studydate_parsed = sdf.parse(studyDate);
+            long deviation = today_parsed.getTime()/86400000 - studydate_parsed.getTime()/86400000;
+
+            if ( deviation == 0){
+                studyDate = "Today";
+            }
+            else if (deviation == 1){
+                studyDate = "Yesterday";
+            }
+            else if (deviation > 1 && deviation < 7){
+                studyDate = deviation + " days ago";
+            }
+            else{
+                String[] splitToday = currentDate.split("/");
+                String[] splitStudyDate = studyDate.split("/");
+                studyDate = handleSplitDMYString(splitToday, splitStudyDate);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return studyDate;
+    }
+
+    private String handleSplitDMYString (String[] today, String[] studyDate){
+        String finalString = "N/A";
+        if (today[0].equals(studyDate[0])){
+            switch (studyDate[1]){
+                case "01":
+                    finalString = "Jan " + studyDate[2];
+                    break;
+                case "02":
+                    finalString = "Feb " + studyDate[2];
+                    break;
+                case "03":
+                    finalString = "Mar " + studyDate[2];
+                    break;
+                case "04":
+                    finalString = "Apr " + studyDate[2];
+                    break;
+                case "05":
+                    finalString = "May " + studyDate[2];
+                    break;
+                case "06":
+                    finalString = "Jun " + studyDate[2];
+                    break;
+                case "07":
+                    finalString = "Jul " + studyDate[2];
+                    break;
+                case "08":
+                    finalString = "Aug " + studyDate[2];
+                    break;
+                case "09":
+                    finalString = "Sep " + studyDate[2];
+                    break;
+                case "10":
+                    finalString = "Oct " + studyDate[2];
+                    break;
+                case "11":
+                    finalString = "Nov " + studyDate[2];
+                    break;
+                case "12":
+                    finalString = "Dec " + studyDate[2];
+                    break;
+            }
+        }
+        else {
+            finalString = studyDate[0] + "/" + studyDate[1] + "/" + studyDate[2];
+        }
+        return finalString;
+    }
+
+    private ArrayList<DataModel> GetDataModel (ArrayList<Form> listForm){
+        ArrayList<DataModel> dataModels = new ArrayList<>();
+        for(int i = 0; i < listForm.size(); i++){
+            // Log.d(TAG, i + " loadXMLData: " + listForm.get(i).toString());
+            String tempname = listForm.get(i).getName();
+            // xử lý chuỗi khi tên quá dài
+            if (tempname.length() > CONSTANTS.MAX_LENGTH_FIRST_STRING ){
+                tempname = tempname.substring(tempname.length() - CONSTANTS.MAX_LENGTH_FIRST_STRING);
+            }
+            String tempidForm = listForm.get(i).getID();
+            String tempmedhis = listForm.get(i).getMedicalHistory();
+            String temppersonalid = listForm.get(i).getPersonalID();
+            String tempdob = listForm.get(i).getDateOfBirth();
+            String tempresult = listForm.get(i).getClassificationResult();
+            String tempStudyDate = listForm.get(i).getToday();
+            tempStudyDate = dateView(tempStudyDate);
+            if (tempmedhis.length() > CONSTANTS.MAX_LENGTH_THIRD_STRING){
+                tempmedhis = tempmedhis.substring(0,CONSTANTS.MAX_LENGTH_THIRD_STRING) + "...";
+            }
+            dataModels.add(new DataModel(tempname,tempdob + " - " + temppersonalid,tempidForm,tempmedhis,tempresult, tempStudyDate));
+        }
+        return dataModels;
     }
 }
