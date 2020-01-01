@@ -138,6 +138,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         adapter= new CustomAdapter(dataModels,getApplicationContext());
         listView.setAdapter(adapter);
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(TAG, "onItemLongClick: long click at position " + position);
+                return false;
+            }
+        });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -284,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 showForm.setCholesterolHDL(res.getString(CONSTANTS.COLUMN_CHOLESTEROL_HDL_INDEX));
                 showForm.setMedicalHistory(res.getString(CONSTANTS.COLUMN_MEDICAL_HISTORY_INDEX));
                 showForm.setNote(res.getString(CONSTANTS.COLUMN_NOTE_INDEX));
+                showForm.setBytearrOriginalImage(res.getBlob(CONSTANTS.COLUMN_ORIGINAL_IMAGE_INDEX));
                 listForm.add(showForm);
                 Log.d(TAG, "loadSQLite data: " + showForm.toString());
             }

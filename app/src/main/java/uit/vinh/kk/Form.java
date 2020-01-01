@@ -24,6 +24,8 @@ public class Form implements Serializable {
     private String image; // base64 string
     private String medicalHistory;
     private String note;
+    private byte[] bytearrOriginalImage;
+    private byte[] bytearrContrastEnhace;
 
 
 
@@ -31,6 +33,7 @@ public class Form implements Serializable {
         this.ID = this.today = this.name = this.dateOfBirth = this.sex = this.personalID = this.classificationResult= "null";
         this.bloodPressure_Diastolic= this.bloodPressure_Systolic= this.bloodSugar= this.hba1c= this.cholesterolHDL = this.cholesterolLDL ="null" ;
         this.image = this.medicalHistory= this.note = "null" ;
+        this.bytearrContrastEnhace = this.bytearrOriginalImage= null;
     }
 
     public String getID() {
@@ -200,4 +203,21 @@ public class Form implements Serializable {
             return 0;
         }
     };
+
+
+    public byte[] getBytearrOriginalImage() {
+        return bytearrOriginalImage;
+    }
+
+    public void setBytearrOriginalImage(byte[] bytearrOriginalImage) {
+        this.bytearrOriginalImage = bytearrOriginalImage;
+    }
+
+    public byte[] getBytearrContrastEnhace() {
+        return bytearrContrastEnhace;
+    }
+
+    public void setBytearrContrastEnhace(byte[] bytearrContrastEnhace) {
+        this.bytearrContrastEnhace = bytearrContrastEnhace;
+    }
 }

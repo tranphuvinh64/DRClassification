@@ -1,6 +1,9 @@
 package uit.vinh.kk;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -8,10 +11,13 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.ByteArrayOutputStream;
 
 public class SaveActivity extends AppCompatActivity {
     DatabaseHelper formDatabase ;
@@ -34,6 +40,9 @@ public class SaveActivity extends AppCompatActivity {
 
     private Spinner spinner_sex;
     private Spinner spinner_result;
+
+    private ImageView imageViewOriginalImage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +71,8 @@ public class SaveActivity extends AppCompatActivity {
         button_calendarDOB = findViewById(R.id.info_button_calendar_dob);
         button_calendarToday = findViewById(R.id.info_button_calendar_today);
 
+        imageViewOriginalImage = findViewById(R.id.info_imageview_OriginalImage);
+
         formDatabase = new DatabaseHelper(this);
 
         String SaveAs = (String) getIntent().getSerializableExtra("Save As");
@@ -85,26 +96,25 @@ public class SaveActivity extends AppCompatActivity {
 
         }
         else if (SaveAs.equals(CONSTANTS.SAVE_AS_MODE_NEW)){
+            Log.d("debug", "onCreate: Save as Mode new");
             // auto get ngày hôm nay set vào edittext
+            Uri URIOriginalImage = (Uri) getIntent().getParcelableExtra("URIOriginalImage");
+            imageViewOriginalImage.setImageURI(URIOriginalImage);
+            //Log.d("save activity", "onCreate: imageview.getdrawable value ==" + imageViewOriginalImage.getDrawable());
         }
-        //tạo giá trị cho spinner
-
         // bắt sự kiện bấm button hiện calendar
-
-
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId())
         {
             case android.R.id.home:
                 SaveActivity.super.onBackPressed();
-                //backtoHomeScreen();
                 return true;
             case R.id.menu_save:
                 String SaveAs = (String) getIntent().getSerializableExtra("Save As");
                 Form prevForm = (Form)getIntent().getSerializableExtra("oldform");
-
                 Form saveForm = new Form();
                 saveForm.setToday(edittext_today.getText().toString());
                 saveForm.setName(edittext_patientName.getText().toString());
@@ -118,9 +128,13 @@ public class SaveActivity extends AppCompatActivity {
                 saveForm.setCholesterolHDL(edittext_hdl.getText().toString());
                 saveForm.setMedicalHistory(edittext_medicalHistory.getText().toString());
                 saveForm.setNote(edittext_note.getText().toString());
-
                 saveForm.setSex(spinner_sex.getSelectedItem().toString());
                 saveForm.setClassificationResult(spinner_result.getSelectedItem().toString());
+                if (imageViewOriginalImage.getDrawable() != null){
+                    // convert bitmap to byte array
+                    byte[] bytearrayOriginalImage = convertBitmaptoByteArray(((BitmapDrawable)imageViewOriginalImage.getDrawable()).getBitmap());
+                    saveForm.setBytearrOriginalImage(bytearrayOriginalImage);
+                }
                 // nếu là edit bệnh nhân
                 if (SaveAs.equals("OLD")){
                     boolean isUpdated = formDatabase.updateData(prevForm.getID(), saveForm);
@@ -134,7 +148,6 @@ public class SaveActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                     else{
-                        Log.d("debug", "Update unsuccessfully");
                         // hiển thị Toast thông báo đã lưu
                         Toast.makeText(getApplicationContext(), "Sorry! Unexpected error!", Toast.LENGTH_SHORT).show();
                     }
@@ -143,9 +156,7 @@ public class SaveActivity extends AppCompatActivity {
                 else if (SaveAs.equals("NEW")){
                     Log.d("debug", saveForm.toString());
                     boolean isInserted = formDatabase.insertNewForm(saveForm);
-                    Log.d("debug", "isInserted ==" + isInserted);
                     if(isInserted == true){
-                        Log.d("debug", "Inserted successfully");
                         // hiển thị Toast thông báo đã lưu
                         Toast.makeText(getApplicationContext(), "Infomation has been saved successfully", Toast.LENGTH_SHORT).show();
                         // chuyển về màn hình chính
@@ -154,32 +165,27 @@ public class SaveActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                     else{
-                        Log.d("debug", "Inserted unsuccessfully");
-                        // hiển thị Toast thông báo đã lưu
+                        // hiển thị Toast thông báo không lưu
                         Toast.makeText(getApplicationContext(), "Sorry! Unexpected error!", Toast.LENGTH_SHORT).show();
                     }
                 }
-
-
-
-
                 // mở xml và lưu
-
-
-
-
-
                 break;
             default:break;
         }
-
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_actionbar_save, menu);
         return true;
     }
 
-
+    private byte[] convertBitmaptoByteArray(Bitmap bmp){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        return byteArray;
+    }
 }

@@ -5,8 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
 
 import androidx.annotation.Nullable;
+
+import java.io.ByteArrayOutputStream;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -41,10 +44,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String column_LDL = "CHOLESTEROL_LDL FLOAT,";
         String column_HDL = "CHOLESTEROL_HDL FLOAT,";
         String column_MedHist = "MEDICALHISTORY TEXT,";
-        String column_Note  = "NOTE TEXT";
+        String column_Note  = "NOTE TEXT,";
         // kiểu dữ liệu chứa 2 ảnh
-
-        String temp = "("+column_FormID+column_Today+column_PatientName+column_DOB+column_Sex+column_PersonalID+column_Result+column_Systolic+column_Diastolic+column_BloodSugar+column_Hba1c+column_LDL+column_HDL+column_MedHist+column_Note+")";
+        String column_OriginalImage = "ORIGINALIMAGE BLOB";
+        String temp = "("+column_FormID+column_Today+column_PatientName+column_DOB+column_Sex+column_PersonalID
+                +column_Result+column_Systolic+column_Diastolic+column_BloodSugar+column_Hba1c+column_LDL+column_HDL
+                +column_MedHist+column_Note+column_OriginalImage+")";
         db.execSQL("CREATE TABLE IF NOT EXISTS " + CONSTANTS.TABLE_NAME + temp);
     }
 
@@ -71,6 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(CONSTANTS.COLUMN_12_HDL,newForm.getCholesterolHDL());
         contentValues.put(CONSTANTS.COLUMN_13_MEDICALHISTORY,newForm.getMedicalHistory());
         contentValues.put(CONSTANTS.COLUMN_14_NOTE,newForm.getNote());
+        contentValues.put(CONSTANTS.COLUMN_15_ORIGINALIMAGE, newForm.getBytearrOriginalImage());
 
         long result = db.insert(CONSTANTS.TABLE_NAME,null,contentValues);
         if(result == -1){
@@ -104,5 +110,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(CONSTANTS.COLUMN_14_NOTE,newForm.getNote());
         db.update(CONSTANTS.TABLE_NAME,contentValues,"ID = ?",new String[] {id});
         return true;
+    }
+
+    private byte[] convertBitmaptoByteArray(Bitmap bmp){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        return byteArray;
     }
 }

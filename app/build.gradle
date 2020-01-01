@@ -53,8 +53,4 @@ dependencies {
 
     // fab button
     implementation 'com.google.android.material:material:<version>'
-
-    //crop
-   compile 'com.soundcloud.android:android-crop:1.0.1@aar'
-
 }

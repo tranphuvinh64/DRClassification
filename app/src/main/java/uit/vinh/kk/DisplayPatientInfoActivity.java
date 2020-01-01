@@ -1,6 +1,8 @@
 package uit.vinh.kk;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -9,6 +11,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,6 +36,8 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
 
     private Spinner spinner_sex;
     private Spinner spinner_result;
+
+    private ImageView imageViewOriginalImage;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -59,6 +64,8 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         spinner_sex = findViewById(R.id.info_spinner_sex);
         spinner_result = findViewById(R.id.info_spinner_result);
 
+        imageViewOriginalImage = findViewById(R.id.info_imageview_OriginalImage);
+
         button_calendarDOB = findViewById(R.id.info_button_calendar_dob);
         button_calendarToday = findViewById(R.id.info_button_calendar_today);
 //        textView.setTag(textView.getKeyListener());
@@ -68,6 +75,7 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         // lấy dữ liệu từ activity trước
         Form prevForm = (Form)getIntent().getSerializableExtra("patientinfo");
         Log.d("debug", "previous info: " + prevForm.getName());
+
         // không cho sửa khi đang view
 
         //edittext_idForm.setKeyListener(null);
@@ -108,6 +116,9 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         spinner_result.setSelection(((ArrayAdapter)spinner_result.getAdapter()).getPosition(prevForm.getClassificationResult()));
         spinner_sex.setSelection(((ArrayAdapter)spinner_sex.getAdapter()).getPosition(prevForm.getSex()));
 
+        byte[] bitmapdata = prevForm.getBytearrOriginalImage();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+        imageViewOriginalImage.setImageBitmap(bitmap);
     }
 
 

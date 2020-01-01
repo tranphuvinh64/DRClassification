@@ -113,8 +113,12 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
             // gửi 1 tín hiệu cho biết chuyển từ màn hình result
 
             Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
+            Uri URI_OriginalImage = (Uri)getIntent().getParcelableExtra("imageURI");
+            intent.putExtra("URIOriginalImage", URI_OriginalImage);
             intent.putExtra("Save As", CONSTANTS.SAVE_AS_MODE_NEW);
-            getIntent().getSerializableExtra("Save As");
+            //getIntent().getSerializableExtra("Save As");
+
+            //getIntent().getParcelableExtra("OriginalImage");
             startActivity(intent);
         }
     }
