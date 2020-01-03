@@ -1,8 +1,7 @@
 package uit.vinh.kk;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -74,7 +73,6 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
 
         // lấy dữ liệu từ activity trước
         Form prevForm = (Form)getIntent().getSerializableExtra("patientinfo");
-        Log.d("debug", "previous info: " + prevForm.getName());
 
         // không cho sửa khi đang view
 
@@ -116,9 +114,19 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         spinner_result.setSelection(((ArrayAdapter)spinner_result.getAdapter()).getPosition(prevForm.getClassificationResult()));
         spinner_sex.setSelection(((ArrayAdapter)spinner_sex.getAdapter()).getPosition(prevForm.getSex()));
 
-        byte[] bitmapdata = prevForm.getBytearrOriginalImage();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
-        imageViewOriginalImage.setImageBitmap(bitmap);
+        //byte[] bitmapdata = prevForm.getBytearrOriginalImage();
+        //Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+        //imageViewOriginalImage.setImageBitmap(bitmap);
+
+        Log.d("debug", "onCreate: uri == " + prevForm.getPathOriginalImage());
+        if (prevForm.getPathOriginalImage().equals("null") == false){
+            Uri uri = Uri.parse(prevForm.getPathOriginalImage());
+            Log.d("debug", "onCreate: uri == " + uri);
+            if (uri != null ){
+                imageViewOriginalImage.setImageURI(uri);
+            }
+
+        }
     }
 
 
@@ -145,10 +153,6 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
 
         return super.onOptionsItemSelected(item);
     }
-//    private void backtoHomeScreen(){
-//        Intent intent = new Intent(this, MainActivity.class);
-//        startActivity(intent);
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

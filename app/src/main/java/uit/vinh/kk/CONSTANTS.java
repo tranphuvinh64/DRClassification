@@ -1,12 +1,16 @@
 package uit.vinh.kk;
 
+import android.os.Environment;
+
+import java.io.File;
+
 public final class CONSTANTS {
 
     // constants for DatabaseHelper
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "patient.db";
     public static final String TABLE_NAME = "FORM";
-    public static final String COLUMN_0_ID = "FORMID";
+    public static final String COLUMN_0_ID = "ID";
     public static final String COLUMN_1_TODAY = "TODAY";
     public static final String COLUMN_2_NAME = "PATIENTNAME";
     public static final String COLUMN_3_DOB = "DATEOFBIRTH";
@@ -21,8 +25,9 @@ public final class CONSTANTS {
     public static final String COLUMN_12_HDL = "CHOLESTEROL_HDL";
     public static final String COLUMN_13_MEDICALHISTORY = "MEDICALHISTORY";
     public static final String COLUMN_14_NOTE = "NOTE";
-    public static final String COLUMN_15_ORIGINALIMAGE = "ORIGINALIMAGE";
-    public static final String COLUMN_16_CONTRASTENHANCE = "CONTRASTENHANCE";
+    public static final String COLUMN_15_PATHORIGINALIMAGE = "PATHORIGINALIMAGE";
+    public static final String COLUMN_16_PATHCONTRASTENHANCE = "PATHCONTRASTENHANCEIMAGE";
+    public static final String COLUMN_17_ISDELETE = "isDelete";
 
     // constants for SaveActivity
     public static final String SAVE_AS_MODE_EDIT = "OLD";
@@ -46,6 +51,12 @@ public final class CONSTANTS {
     public static final int COLUMN_CHOLESTEROL_HDL_INDEX = 12;
     public static final int COLUMN_MEDICAL_HISTORY_INDEX = 13;
     public static final int COLUMN_NOTE_INDEX = 14;
-    public static final int COLUMN_ORIGINAL_IMAGE_INDEX = 15;
-    public static final int COLUMN_CONTRAST_ENHANCE_INDEX = 16;
+    public static final int COLUMN_PATH_ORIGINAL_IMAGE_INDEX = 15;
+    public static final int COLUMN_PATH_CONTRAST_ENHANCE_IMAGE_INDEX = 16;
+    public static final int COLUMN_ISDELETE = 17;
+
+    public static  final String STORE_IMG_FOLDER_NAME = "DRClassification";
+
+    //
+    public static final String FOLDER_PATH_STORE_IMG = Environment.getExternalStorageDirectory()+ File.separator + STORE_IMG_FOLDER_NAME;
 }

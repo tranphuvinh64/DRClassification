@@ -5,11 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
-
-import java.io.ByteArrayOutputStream;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -30,26 +28,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String column_FormID = "ID INTEGER PRIMARY KEY AUTOINCREMENT,";
-        String column_Today = "TODAY CHAR(20),";
-        String column_PatientName = "PATIENTNAME TEXT,";
-        String column_DOB = "DATEOFBIRTH CHAR(20),";
-        String column_Sex = "SEX CHAR(10),";
-        String column_PersonalID = "PERSONALID TEXT,";
-        String column_Result = "RESULT CHAR(50),";
-        String column_Systolic = "BLOODPRESSURE_SYSTOLIC FLOAT,";
-        String column_Diastolic = "BLOODPRESSURE_DIASTOLIC FLOAT,";
-        String column_BloodSugar = "BLOODSUGAR FLOAT,";
-        String column_Hba1c = "HBA1C FLOAT,";
-        String column_LDL = "CHOLESTEROL_LDL FLOAT,";
-        String column_HDL = "CHOLESTEROL_HDL FLOAT,";
-        String column_MedHist = "MEDICALHISTORY TEXT,";
-        String column_Note  = "NOTE TEXT,";
-        // kiểu dữ liệu chứa 2 ảnh
-        String column_OriginalImage = "ORIGINALIMAGE BLOB";
-        String temp = "("+column_FormID+column_Today+column_PatientName+column_DOB+column_Sex+column_PersonalID
-                +column_Result+column_Systolic+column_Diastolic+column_BloodSugar+column_Hba1c+column_LDL+column_HDL
-                +column_MedHist+column_Note+column_OriginalImage+")";
+        String column_0_FormID = CONSTANTS.COLUMN_0_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,";
+        String column_1_Today = CONSTANTS.COLUMN_1_TODAY + " CHAR(20),";
+        String column_2_PatientName = CONSTANTS.COLUMN_2_NAME + " TEXT,";
+        String column_3_DOB = CONSTANTS.COLUMN_3_DOB + " CHAR(20),";
+        String column_4_Sex = CONSTANTS.COLUMN_4_SEX + " CHAR(10),";
+        String column_5_PersonalID = CONSTANTS.COLUMN_5_PERSONALID + " TEXT,";
+        String column_6_Result = CONSTANTS.COLUMN_6_RESULT + " CHAR(50),";
+        String column_7_Systolic = CONSTANTS.COLUMN_7_SYSTOLIC + " FLOAT,";
+        String column_8_Diastolic = CONSTANTS.COLUMN_8_DIASTOLIC + " FLOAT,";
+        String column_9_BloodSugar = CONSTANTS.COLUMN_9_BLOODSUGAR + " FLOAT,";
+        String column_10_Hba1c = CONSTANTS.COLUMN_10_HBA1C + " FLOAT,";
+        String column_11_LDL = CONSTANTS.COLUMN_11_LDL + " FLOAT,";
+        String column_12_HDL = CONSTANTS.COLUMN_12_HDL + " FLOAT,";
+        String column_13_MedHist = CONSTANTS.COLUMN_13_MEDICALHISTORY + " TEXT,";
+        String column_14_Note  = CONSTANTS.COLUMN_14_NOTE + " TEXT,";
+        String column_15_PathOriginalImage = CONSTANTS.COLUMN_15_PATHORIGINALIMAGE + " TEXT,";
+        String column_16_PathContrastEnhnaceImage = CONSTANTS.COLUMN_16_PATHCONTRASTENHANCE + " TEXT,";
+        String column_17_isDeleted = CONSTANTS.COLUMN_17_ISDELETE + " BOOLEAN DEFAULT FALSE";
+
+        String temp = "("+column_0_FormID+column_1_Today+column_2_PatientName+column_3_DOB+column_4_Sex+column_5_PersonalID
+                +column_6_Result+column_7_Systolic+column_8_Diastolic+column_9_BloodSugar+column_10_Hba1c+column_11_LDL+column_12_HDL
+                + column_13_MedHist+column_14_Note + column_15_PathOriginalImage + column_16_PathContrastEnhnaceImage + column_17_isDeleted + ")";
         db.execSQL("CREATE TABLE IF NOT EXISTS " + CONSTANTS.TABLE_NAME + temp);
     }
 
@@ -76,8 +76,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(CONSTANTS.COLUMN_12_HDL,newForm.getCholesterolHDL());
         contentValues.put(CONSTANTS.COLUMN_13_MEDICALHISTORY,newForm.getMedicalHistory());
         contentValues.put(CONSTANTS.COLUMN_14_NOTE,newForm.getNote());
-        contentValues.put(CONSTANTS.COLUMN_15_ORIGINALIMAGE, newForm.getBytearrOriginalImage());
-
+        contentValues.put(CONSTANTS.COLUMN_15_PATHORIGINALIMAGE,newForm.getPathOriginalImage());
+        contentValues.put(CONSTANTS.COLUMN_16_PATHCONTRASTENHANCE,newForm.getPathContrastEnhaceImage());
         long result = db.insert(CONSTANTS.TABLE_NAME,null,contentValues);
         if(result == -1){
             return false;
@@ -112,10 +112,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    private byte[] convertBitmaptoByteArray(Bitmap bmp){
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        return byteArray;
+    public boolean deleteForm (String id ){
+        String query = "UPDATE " + CONSTANTS.TABLE_NAME + " SET "
+                + CONSTANTS.COLUMN_17_ISDELETE + " = ?  WHERE "
+                + CONSTANTS.COLUMN_0_ID + " = ?";
+        Log.d("debug", "deleteForm: query = "+ query );
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query,new String[]{"TRUE",id});
+        return true;
     }
 }

@@ -1,7 +1,9 @@
 package uit.vinh.kk;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -10,9 +12,11 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +41,7 @@ import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -62,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // will hold uri of image obtained from camera
     private Uri imageUri;
     static DatabaseHelper formDatabase ;
-
+    ArrayList<DataModel> dataModels;
     //private static ArrayList<Form> listForm = loadXMLData("//storage//emulated//0//patientData");
     private static ArrayList<Form> listForm;
     ListView listView;
@@ -154,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         formDatabase = new DatabaseHelper(this);
 
         listForm = loadSQLiteData();
-        ArrayList<DataModel> dataModels = GetDataModel(listForm);
+        dataModels = GetDataModel(listForm);
 
         adapter= new CustomAdapter(dataModels,getApplicationContext());
         listView.setAdapter(adapter);
@@ -181,6 +186,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
+
+        registerForContextMenu(listView);
+        // create folder to save image
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+            Log.d("MyApp", "No SDCARD");
+        } else {
+            File directory = new File(Environment.getExternalStorageDirectory()+ File.separator + CONSTANTS.STORE_IMG_FOLDER_NAME);
+            directory.mkdirs();
+            Log.d(TAG, "onCreate: create folder at " + Environment.getExternalStorageDirectory() + File.separator + CONSTANTS.STORE_IMG_FOLDER_NAME);
+        }
+    }
+
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        if (item.getItemId() == R.id.menu_option_delete){
+            Log.d(TAG, "onContextItemSelected: Deleted at "+ info.position);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder.setTitle("Are you sure?");
+            builder.setMessage("You are going to delete a patient! This action cannot be undone");
+
+            builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+                public void onClick(DialogInterface dialog, int which) {
+                    // delete form
+                    DataModel dataModel= dataModels.get(info.position);
+                    formDatabase.deleteForm(dataModel.getIdForm());
+                    // reload MainActivity
+
+                    // Do nothing but close the dialog
+                    // dialog.dismiss();
+                }
+            });
+
+            builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // Do nothing
+                    dialog.dismiss();
+                }
+            });
+
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.menu_delete_patient_info,menu);
     }
 
     @Override
@@ -301,8 +361,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 showForm.setCholesterolHDL(res.getString(CONSTANTS.COLUMN_CHOLESTEROL_HDL_INDEX));
                 showForm.setMedicalHistory(res.getString(CONSTANTS.COLUMN_MEDICAL_HISTORY_INDEX));
                 showForm.setNote(res.getString(CONSTANTS.COLUMN_NOTE_INDEX));
-                showForm.setBytearrOriginalImage(res.getBlob(CONSTANTS.COLUMN_ORIGINAL_IMAGE_INDEX));
-                listForm.add(showForm);
+                showForm.setPathOriginalImage(res.getString(CONSTANTS.COLUMN_PATH_ORIGINAL_IMAGE_INDEX));
+                //Log.d(TAG, "path in SQLite ==: " + res.getString(CONSTANTS.COLUMN_PATH_ORIGINAL_IMAGE_INDEX));
+                //showForm.setPathContrastEnhaceImage(res.getString(CONSTANTS.COLUMN_PATH_CONTRAST_ENHANCE_IMAGE_INDEX));
+                if (res.getString(CONSTANTS.COLUMN_ISDELETE).equals("FALSE")){
+                    listForm.add(showForm);
+                }
                 Log.d(TAG, "loadSQLite data: " + showForm.toString());
             }
         }

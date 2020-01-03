@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +19,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class SaveActivity extends AppCompatActivity {
     DatabaseHelper formDatabase ;
@@ -42,7 +49,7 @@ public class SaveActivity extends AppCompatActivity {
     private Spinner spinner_result;
 
     private ImageView imageViewOriginalImage;
-
+    private File directory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +120,7 @@ public class SaveActivity extends AppCompatActivity {
                 SaveActivity.super.onBackPressed();
                 return true;
             case R.id.menu_save:
+
                 String SaveAs = (String) getIntent().getSerializableExtra("Save As");
                 Form prevForm = (Form)getIntent().getSerializableExtra("oldform");
                 Form saveForm = new Form();
@@ -130,10 +138,22 @@ public class SaveActivity extends AppCompatActivity {
                 saveForm.setNote(edittext_note.getText().toString());
                 saveForm.setSex(spinner_sex.getSelectedItem().toString());
                 saveForm.setClassificationResult(spinner_result.getSelectedItem().toString());
+
+                // nếu không có sdcard -> không lưu ảnh
+                if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+                        // set giá trị null cho path
+                }
+                else{ // nếu có sdcard -> kiểm tra có thư mục hay không -> tạo thư mục -> nếu là thông tin mới -> lưu ảnh
+                    directory = new File(CONSTANTS.FOLDER_PATH_STORE_IMG);
+                    if (!directory.exists()) {
+                        directory.mkdirs();
+                    }
+                }
+
                 if (imageViewOriginalImage.getDrawable() != null){
                     // convert bitmap to byte array
                     byte[] bytearrayOriginalImage = convertBitmaptoByteArray(((BitmapDrawable)imageViewOriginalImage.getDrawable()).getBitmap());
-                    saveForm.setBytearrOriginalImage(bytearrayOriginalImage);
+                    //saveForm.setBytearrOriginalImage(bytearrayOriginalImage);
                 }
                 // nếu là edit bệnh nhân
                 if (SaveAs.equals("OLD")){
@@ -154,7 +174,26 @@ public class SaveActivity extends AppCompatActivity {
                 }
                 // nếu là lưu mới thông tin bệnh nhân
                 else if (SaveAs.equals("NEW")){
-                    Log.d("debug", saveForm.toString());
+                    Bitmap bitmap = ((BitmapDrawable)imageViewOriginalImage.getDrawable()).getBitmap();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
+                    String saveImageName = sdf.format(new Date()) + ".png";
+                    File file = new File(directory ,saveImageName);
+                    try {
+                        OutputStream output = new FileOutputStream(file);
+                        // Compress into png format image from 0% - 100%
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
+                        output.flush();
+                        output.close();
+                    }
+                    catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    // lưu vào sqlite
+                    saveForm.setPathOriginalImage(CONSTANTS.FOLDER_PATH_STORE_IMG + File.separator + saveImageName);
+                    Log.d("debug", "onOptionsItemSelected: saveForm.getPathOriginalImage() == " + saveForm.getPathOriginalImage());
+                    Log.d("debug", "onOptionsItemSelected: saveForm.toString() == "+ saveForm.toString());
                     boolean isInserted = formDatabase.insertNewForm(saveForm);
                     if(isInserted == true){
                         // hiển thị Toast thông báo đã lưu

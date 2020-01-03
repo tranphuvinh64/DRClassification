@@ -21,19 +21,18 @@ public class Form implements Serializable {
     private String hba1c;
     private String cholesterolHDL;
     private String cholesterolLDL;
-    private String image; // base64 string
     private String medicalHistory;
     private String note;
-    private byte[] bytearrOriginalImage;
-    private byte[] bytearrContrastEnhace;
 
+    private String pathOriginalImage;
+    private String pathContrastEnhaceImage;
 
 
     public Form() {
         this.ID = this.today = this.name = this.dateOfBirth = this.sex = this.personalID = this.classificationResult= "null";
         this.bloodPressure_Diastolic= this.bloodPressure_Systolic= this.bloodSugar= this.hba1c= this.cholesterolHDL = this.cholesterolLDL ="null" ;
-        this.image = this.medicalHistory= this.note = "null" ;
-        this.bytearrContrastEnhace = this.bytearrOriginalImage= null;
+        this.medicalHistory= this.note = "null" ;
+        this.pathOriginalImage = this.pathContrastEnhaceImage = "null";
     }
 
     public String getID() {
@@ -124,13 +123,6 @@ public class Form implements Serializable {
         this.hba1c = hba1c;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
 
     public String getMedicalHistory() {
         return medicalHistory;
@@ -180,9 +172,10 @@ public class Form implements Serializable {
                 ", hba1c='" + hba1c + '\'' +
                 ", cholesterolHDL='" + cholesterolHDL + '\'' +
                 ", cholesterolLDL='" + cholesterolLDL + '\'' +
-                ", image='" + image + '\'' +
                 ", medicalHistory='" + medicalHistory + '\'' +
                 ", note='" + note + '\'' +
+                ", pathOriginalImage='" + pathOriginalImage + '\'' +
+                ", pathContrastEnhaceImage='" + pathContrastEnhaceImage + '\'' +
                 '}';
     }
 
@@ -205,19 +198,20 @@ public class Form implements Serializable {
     };
 
 
-    public byte[] getBytearrOriginalImage() {
-        return bytearrOriginalImage;
+
+    public String getPathOriginalImage() {
+        return pathOriginalImage;
     }
 
-    public void setBytearrOriginalImage(byte[] bytearrOriginalImage) {
-        this.bytearrOriginalImage = bytearrOriginalImage;
+    public void setPathOriginalImage(String pathOriginalImage) {
+        this.pathOriginalImage = pathOriginalImage;
     }
 
-    public byte[] getBytearrContrastEnhace() {
-        return bytearrContrastEnhace;
+    public String getPathContrastEnhaceImage() {
+        return pathContrastEnhaceImage;
     }
 
-    public void setBytearrContrastEnhace(byte[] bytearrContrastEnhace) {
-        this.bytearrContrastEnhace = bytearrContrastEnhace;
+    public void setPathContrastEnhaceImage(String pathContrastEnhaceImage) {
+        this.pathContrastEnhaceImage = pathContrastEnhaceImage;
     }
 }
