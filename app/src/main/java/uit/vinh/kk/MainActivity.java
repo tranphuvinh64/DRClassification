@@ -216,7 +216,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     DataModel dataModel= dataModels.get(info.position);
                     formDatabase.deleteForm(dataModel.getIdForm());
                     // reload MainActivity
-
+                    Intent intent = getIntent();
+                    overridePendingTransition(0, 0);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    finish();
+                    overridePendingTransition(0, 0);
+                    startActivity(intent);
                     // Do nothing but close the dialog
                     // dialog.dismiss();
                 }
