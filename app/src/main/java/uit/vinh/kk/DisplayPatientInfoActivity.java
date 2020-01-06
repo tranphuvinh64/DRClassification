@@ -6,29 +6,44 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
 public class DisplayPatientInfoActivity extends AppCompatActivity{
-    private EditText edittext_idForm;
-    private EditText edittext_today;
-    private EditText edittext_patientName;
-    private EditText edittext_dateOfBirth;
-    private EditText edittext_personalID;
-    private EditText edittext_systolic;
-    private EditText edittext_diastolic;
-    private EditText edittext_bloodSugar;
-    private EditText edittext_hba1c;
-    private EditText edittext_hdl;
-    private EditText edittext_ldl;
-    private EditText edittext_medicalHistory;
-    private EditText edittext_note;
+
+    private TextInputLayout textInputLayout_Today;
+    private TextInputLayout textInputLayout_PatientName;
+    private TextInputLayout textInputLayout_DateOfBirth;
+    private TextInputLayout textInputLayout_PersonalID;
+    private TextInputLayout textInputLayout_Systolic;
+    private TextInputLayout textInputLayout_Diastolic;
+    private TextInputLayout textInputLayout_BloodSugar;
+    private TextInputLayout textInputLayout_Hba1c;
+    private TextInputLayout textInputLayout_HDL;
+    private TextInputLayout textInputLayout_LDL;
+    private TextInputLayout textInputLayout_MedicalHistory;
+    private TextInputLayout textInputLayout_Note;
+
+    private TextInputEditText textInputEditText_Today;
+    private TextInputEditText textInputEditText_PatientName;
+    private TextInputEditText textInputEditText_DateOfBirth;
+    private TextInputEditText textInputEditText_PersonalID;
+    private TextInputEditText textInputEditText_Systolic;
+    private TextInputEditText textInputEditText_Diastolic;
+    private TextInputEditText textInputEditText_BloodSugar;
+    private TextInputEditText textInputEditText_Hba1c;
+    private TextInputEditText textInputEditText_HDL;
+    private TextInputEditText textInputEditText_LDL;
+    private TextInputEditText textInputEditText_MedicalHistory;
+    private TextInputEditText textInputEditText_Note;
+
 
     private Button button_calendarToday;
     private Button button_calendarDOB;
@@ -44,29 +59,37 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // create components
-        //edittext_idForm = findViewById(R.id.info_edittext_idform);
-        edittext_today = findViewById(R.id.info_edittext_today);
-        edittext_patientName = findViewById(R.id.info_edittext_fullname);
-        edittext_dateOfBirth = findViewById(R.id.info_edittext_dob);
-        //spinner sex later
-        edittext_personalID = findViewById(R.id.info_edittext_personalID);
-        // spinner result
-        edittext_systolic = findViewById(R.id.info_edittext_bloodpressure_systolic);
-        edittext_diastolic = findViewById(R.id.info_edittext_bloodpressure_diastolic);
-        edittext_bloodSugar = findViewById(R.id.info_edittext_bloodsugar);
-        edittext_hba1c = findViewById(R.id.info_edittext_hba1c);
-        edittext_hdl = findViewById(R.id.info_edittext_cholesterolHDL);
-        edittext_ldl = findViewById(R.id.info_edittext_cholesterolLDL);
-        edittext_medicalHistory = findViewById(R.id.info_edittext_medical_history);
-        edittext_note = findViewById(R.id.info_edittext_note);
+        textInputEditText_Today = findViewById(R.id.info_textinputedittext_Today);
+        textInputEditText_PatientName = findViewById(R.id.info_textinputedittext_PatientName);
+        textInputEditText_DateOfBirth = findViewById(R.id.info_textinputedittext_DateOfBirth);
+        textInputEditText_PersonalID = findViewById(R.id.info_textinputedittext_PersonalID);
+        textInputEditText_Systolic = findViewById(R.id.info_textinputedittext_Systolic);
+        textInputEditText_Diastolic = findViewById(R.id.info_textinputedittext_Diastolic);
+        textInputEditText_BloodSugar = findViewById(R.id.info_textinputedittext_BloodSugar);
+        textInputEditText_Hba1c = findViewById(R.id.info_textinputedittext_Hba1c);
+        textInputEditText_HDL = findViewById(R.id.info_textinputedittext_HDL);
+        textInputEditText_LDL = findViewById(R.id.info_textinputedittext_LDL);
+        textInputEditText_MedicalHistory = findViewById(R.id.info_textinputedittext_MedicalHistory);
+        textInputEditText_Note = findViewById(R.id.info_textinputedittext_Note);
+
+        textInputLayout_Today = findViewById(R.id.info_textinputlayout_Today);
+        textInputLayout_PatientName = findViewById(R.id.info_textinputlayout_PatientName);
+        textInputLayout_DateOfBirth = findViewById(R.id.info_textinputlayout_DateOfBirth);
+        textInputLayout_PersonalID = findViewById(R.id.info_textinputlayout_PersonalID);
+        textInputLayout_Systolic = findViewById(R.id.info_textinputlayout_Systolic);
+        textInputLayout_Diastolic = findViewById(R.id.info_textinputlayout_Diastolic);
+        textInputLayout_BloodSugar = findViewById(R.id.info_textinputlayout_BloodSugar);
+        textInputLayout_Hba1c = findViewById(R.id.info_textinputlayout_Hba1c);
+        textInputLayout_HDL = findViewById( R.id.info_textinputlayout_HDL);
+        textInputLayout_LDL = findViewById(R.id.info_textinputlayout_LDL);
+        textInputLayout_MedicalHistory = findViewById(R.id.info_textinputlayout_MedicalHistory);
+        textInputLayout_Note = findViewById(R.id.info_textinputlayout_MedicalHistory);
 
         spinner_sex = findViewById(R.id.info_spinner_sex);
         spinner_result = findViewById(R.id.info_spinner_result);
 
         imageViewOriginalImage = findViewById(R.id.info_imageview_OriginalImage);
 
-        button_calendarDOB = findViewById(R.id.info_button_calendar_dob);
-        button_calendarToday = findViewById(R.id.info_button_calendar_today);
 //        textView.setTag(textView.getKeyListener());
 //        textView.setKeyListener(null);
         //Name.setTag(Name.getKeyListener());
@@ -77,38 +100,37 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         // không cho sửa khi đang view
 
         //edittext_idForm.setKeyListener(null);
-        edittext_today.setKeyListener(null);
-        edittext_patientName.setKeyListener(null);
-        edittext_dateOfBirth.setKeyListener(null);
-        edittext_personalID.setKeyListener(null);
-        edittext_systolic.setKeyListener(null);
-        edittext_diastolic.setKeyListener(null);
-        edittext_bloodSugar.setKeyListener(null);
-        edittext_hba1c.setKeyListener(null);
-        edittext_hdl.setKeyListener(null);
-        edittext_ldl.setKeyListener(null);
-        edittext_medicalHistory.setKeyListener(null);
-        edittext_note.setKeyListener(null);
+        textInputEditText_Today.setKeyListener(null);
+        textInputEditText_PatientName.setKeyListener(null);
+        textInputEditText_DateOfBirth.setKeyListener(null);
+        textInputEditText_PersonalID.setKeyListener(null);
+        textInputEditText_Systolic.setKeyListener(null);
+        textInputEditText_Diastolic.setKeyListener(null);
+        textInputEditText_BloodSugar.setKeyListener(null);
+        textInputEditText_Hba1c.setKeyListener(null);
+        textInputEditText_HDL.setKeyListener(null);
+        textInputEditText_LDL.setKeyListener(null);
+        textInputEditText_MedicalHistory.setKeyListener(null);
+        textInputEditText_Note.setKeyListener(null);
 
-        button_calendarDOB.setVisibility(View.INVISIBLE);
-        button_calendarToday.setVisibility(View.INVISIBLE);
+
 
         spinner_result.setEnabled(false);
         spinner_sex.setEnabled(false);
 
         //edittext_idForm.setText(prevForm.getID());
-        edittext_patientName.setText(prevForm.getName());
-        edittext_today.setText(prevForm.getToday());
-        edittext_dateOfBirth.setText(prevForm.getDateOfBirth());
-        edittext_personalID.setText(prevForm.getPersonalID());
-        edittext_systolic.setText(prevForm.getBloodPressure_Systolic());
-        edittext_diastolic.setText(prevForm.getBloodPressure_Diastolic());
-        edittext_bloodSugar.setText(prevForm.getBloodSugar());
-        edittext_hba1c.setText(prevForm.getHba1c());
-        edittext_hdl.setText(prevForm.getCholesterolHDL());
-        edittext_ldl.setText(prevForm.getCholesterolLDL());
-        edittext_medicalHistory.setText(prevForm.getMedicalHistory());
-        edittext_note.setText(prevForm.getNote());
+        textInputEditText_PatientName.setText(prevForm.getName());
+        textInputEditText_Today.setText(prevForm.getToday());
+        textInputEditText_DateOfBirth.setText(prevForm.getDateOfBirth());
+        textInputEditText_PersonalID.setText(prevForm.getPersonalID());
+        textInputEditText_Systolic.setText(prevForm.getBloodPressure_Systolic());
+        textInputEditText_Diastolic.setText(prevForm.getBloodPressure_Diastolic());
+        textInputEditText_BloodSugar.setText(prevForm.getBloodSugar());
+        textInputEditText_Hba1c.setText(prevForm.getHba1c());
+        textInputEditText_HDL.setText(prevForm.getCholesterolHDL());
+        textInputEditText_LDL.setText(prevForm.getCholesterolLDL());
+        textInputEditText_MedicalHistory.setText(prevForm.getMedicalHistory());
+        textInputEditText_Note.setText(prevForm.getNote());
 
 
         spinner_result.setSelection(((ArrayAdapter)spinner_result.getAdapter()).getPosition(prevForm.getClassificationResult()));
@@ -150,7 +172,6 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
                 break;
             default:break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

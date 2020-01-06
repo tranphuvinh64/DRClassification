@@ -53,4 +53,13 @@ dependencies {
 
     // fab button
     implementation 'com.google.android.material:material:<version>'
+
+    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+
+    // text field design
+    //implementation 'com.google.android.material:material:1.1.0-alpha09'
+    implementation 'com.google.android.material:material:1.0.0-beta01'
+    //implementation 'com.google.android.material:material:1.1.0-alpha06'
+    implementation 'com.android.support:design:28.0.0-alpha1'
+
 }

@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -55,6 +57,7 @@ import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Serializable {
+    public Handler handler;
     public static final int REQUEST_PERMISSION = 300;
     // for permission requests access camera
     public static final int REQUEST_PERMISSION_CAMERA = 0;
@@ -192,10 +195,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
             Log.d("MyApp", "No SDCARD");
         } else {
-            File directory = new File(Environment.getExternalStorageDirectory()+ File.separator + CONSTANTS.STORE_IMG_FOLDER_NAME);
+            File directory = new File(CONSTANTS.FOLDER_PATH_STORE_IMG);
             directory.mkdirs();
             Log.d(TAG, "onCreate: create folder at " + Environment.getExternalStorageDirectory() + File.separator + CONSTANTS.STORE_IMG_FOLDER_NAME);
+            File nomediaFile = new File(CONSTANTS.FOLDER_PATH_STORE_IMG + File.separator+ ".nomedia");
+            try {
+                boolean result = nomediaFile.createNewFile();
+                if (result == true ){
+                    Log.d(TAG, "onCreate: create nomedia file at " + CONSTANTS.FOLDER_PATH_STORE_IMG + File.separator+ ".nomedia");
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
+        handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if (msg.what == 100){
+                    Log.d(TAG, "handleMessage: MainActivity save data successfully ");
+                }
+            }
+        };
     }
 
 
