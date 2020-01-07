@@ -1,6 +1,7 @@
 package uit.vinh.kk;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -68,6 +70,7 @@ public class SaveActivity extends AppCompatActivity {
     private Spinner spinner_sex;
     private Spinner spinner_result;
 
+    private PhotoView photoViewOriginalImage;
     private ImageView imageViewOriginalImage;
     private File directory;
     private Thread saveImageThread;
@@ -148,7 +151,8 @@ public class SaveActivity extends AppCompatActivity {
         spinner_result = findViewById(R.id.info_spinner_result);
 
 
-        imageViewOriginalImage = findViewById(R.id.info_imageview_OriginalImage);
+        photoViewOriginalImage = findViewById(R.id.info_photoview_OriginalImage);
+        //imageViewOriginalImage = findViewById(R.id.info_imageview_OriginalImage);
 
         formDatabase = new DatabaseHelper(this);
 
@@ -178,8 +182,8 @@ public class SaveActivity extends AppCompatActivity {
             Log.d("debug", "onCreate: Save as Mode new");
             // auto get ngày hôm nay set vào edittext
             Uri URIOriginalImage = (Uri) getIntent().getParcelableExtra("URIOriginalImage");
-            imageViewOriginalImage.setImageURI(URIOriginalImage);
-            //Log.d("save activity", "onCreate: imageview.getdrawable value ==" + imageViewOriginalImage.getDrawable());
+            //imageViewOriginalImage.setImageURI(URIOriginalImage);
+            photoViewOriginalImage.setImageURI(URIOriginalImage);
         }
         // bắt sự kiện bấm button hiện calendar
 
@@ -221,7 +225,7 @@ public class SaveActivity extends AppCompatActivity {
                 }
                 // nếu là lưu mới thông tin bệnh nhân
                 else if (SaveAs.equals("NEW")){
-                    Bitmap bitmap = ((BitmapDrawable)imageViewOriginalImage.getDrawable()).getBitmap();
+                    Bitmap bitmap = ((BitmapDrawable)photoViewOriginalImage.getDrawable()).getBitmap();
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
                     String saveImageName = sdf.format(new Date()) + ".jpg";
                     File file = new File(directory ,saveImageName);
@@ -269,8 +273,17 @@ public class SaveActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_save:
                 long startTime = System.nanoTime();
-                //saveImageRunnable.run();
-                saveImageThread.start();
+                // save data with multithread
+                //saveImageThread.start();
+
+                ProgressDialog progress = new ProgressDialog(this);
+                progress.setTitle("Processing");
+                progress.setMessage("Saving data...");
+                progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+                progress.show();
+                // save data without multithread
+                WithoutMultiThread();
+                progress.dismiss();
                 long endTime = System.nanoTime();
                 Log.d("debug", "onOptionsItemSelected: Main thread ended");
                 Log.d("debug", "onOptionsItemSelected: With Multithread time is :" + (endTime - startTime )/1000);
@@ -287,6 +300,72 @@ public class SaveActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void WithoutMultiThread(){
+        String SaveAs = (String) getIntent().getSerializableExtra("Save As");
+        Form prevForm = (Form)getIntent().getSerializableExtra("oldform");
+        Form saveForm = new Form();
+        saveForm.setToday(textInputEditText_Today.getText().toString());
+        saveForm.setName(textInputEditText_PatientName.getText().toString());
+        saveForm.setDateOfBirth(textInputEditText_DateOfBirth.getText().toString());
+        saveForm.setPersonalID(textInputEditText_PersonalID.getText().toString());
+        saveForm.setBloodPressure_Systolic(textInputEditText_Systolic.getText().toString());
+        saveForm.setBloodPressure_Diastolic(textInputEditText_Diastolic.getText().toString());
+        saveForm.setBloodSugar(textInputEditText_BloodSugar.getText().toString());
+        saveForm.setHba1c(textInputEditText_Hba1c.getText().toString());
+        saveForm.setCholesterolLDL(textInputEditText_LDL.getText().toString());
+        saveForm.setCholesterolHDL(textInputEditText_HDL.getText().toString());
+        saveForm.setMedicalHistory(textInputEditText_MedicalHistory.getText().toString());
+        saveForm.setNote(textInputEditText_Note.getText().toString());
+        saveForm.setSex(spinner_sex.getSelectedItem().toString());
+        saveForm.setClassificationResult(spinner_result.getSelectedItem().toString());
+
+        // nếu không có sdcard -> không lưu ảnh
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+            // set giá trị null cho path
+        }
+        else{ // nếu có sdcard -> kiểm tra có thư mục hay không -> tạo thư mục -> nếu là thông tin mới -> lưu ảnh
+            directory = new File(CONSTANTS.FOLDER_PATH_STORE_IMG);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+        }
+
+        // nếu là edit bệnh nhân
+        if (SaveAs.equals("OLD")){
+            boolean isUpdated = formDatabase.updateData(prevForm.getID(), saveForm);
+        }
+        // nếu là lưu mới thông tin bệnh nhân
+        else if (SaveAs.equals("NEW")){
+            Bitmap bitmap = ((BitmapDrawable)photoViewOriginalImage.getDrawable()).getBitmap();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
+            String saveImageName = sdf.format(new Date()) + ".jpg";
+            File file = new File(directory ,saveImageName);
+            try {
+
+                OutputStream output = new FileOutputStream(file);
+                long startTime = System.nanoTime();
+                // Compress into png, jpg format image from 0% - 100%
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
+                long endTime = System.nanoTime();
+                output.flush();
+                output.close();
+            }
+            catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            // lưu vào sqlite
+            saveForm.setPathOriginalImage(CONSTANTS.FOLDER_PATH_STORE_IMG + File.separator + saveImageName);
+            long startTime = System.nanoTime();
+            boolean isInserted = formDatabase.insertNewForm(saveForm);
+            if (isInserted == true){
+                // gửi tín hiệu cho MainActivity
+
+            }
+        }
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_actionbar_save, menu);

@@ -62,4 +62,8 @@ dependencies {
     //implementation 'com.google.android.material:material:1.1.0-alpha06'
     implementation 'com.android.support:design:28.0.0-alpha1'
 
+    // zoom image
+    //implementation 'com.github.chrisbanes:PhotoView:latest.release.here'
+    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
+
 }

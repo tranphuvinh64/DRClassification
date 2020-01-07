@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/imageview_fundus"
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/photoview"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="@color/blackBackground" />
+        android:background="@color/blackBackground"/>
     <LinearLayout
         android:id="@+id/gesture_layout"
         android:layout_width="match_parent"

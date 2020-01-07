@@ -13,6 +13,7 @@ import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -45,12 +46,14 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
     private TextInputEditText textInputEditText_Note;
 
 
+
     private Button button_calendarToday;
     private Button button_calendarDOB;
 
     private Spinner spinner_sex;
     private Spinner spinner_result;
 
+    private PhotoView photoViewOriginalImage;
     private ImageView imageViewOriginalImage;
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -88,7 +91,9 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         spinner_sex = findViewById(R.id.info_spinner_sex);
         spinner_result = findViewById(R.id.info_spinner_result);
 
-        imageViewOriginalImage = findViewById(R.id.info_imageview_OriginalImage);
+
+
+        photoViewOriginalImage = findViewById(R.id.info_photoview_OriginalImage);
 
 //        textView.setTag(textView.getKeyListener());
 //        textView.setKeyListener(null);
@@ -145,7 +150,8 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
             Uri uri = Uri.parse(prevForm.getPathOriginalImage());
             Log.d("debug", "onCreate: uri == " + uri);
             if (uri != null ){
-                imageViewOriginalImage.setImageURI(uri);
+                //imageViewOriginalImage.setImageURI(uri);
+                photoViewOriginalImage.setImageURI(uri);
             }
 
         }

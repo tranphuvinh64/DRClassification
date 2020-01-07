@@ -1,5 +1,6 @@
 package uit.vinh.kk;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -10,10 +11,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -43,7 +45,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
             recognition2ValueTextView,
             recognition3ValueTextView,
             recognition4ValueTextView;
-    ImageView imageView;
+    private PhotoView photoView;
     Button buttonSave;
     private Bitmap rgbFrameBitmap = null;
     private Classifier classifier;
@@ -54,7 +56,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         // initialize array that holds image data
         intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
         setContentView(R.layout.activity_classificationresult);
-        imageView = findViewById(R.id.imageview_fundus);
+        photoView = findViewById(R.id.photoview);
         buttonSave = findViewById(R.id.buttonSaveData);
         buttonSave.setOnClickListener(this);
         rgbFrameBitmap = Bitmap.createBitmap(640,480,Bitmap.Config.ARGB_8888);
@@ -81,8 +83,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Uri uri = (Uri)getIntent().getParcelableExtra("imageURI");
-        imageView.setImageURI(uri);
-
+        photoView.setImageURI(uri);
         // put function classify here
         Classify();
 
@@ -111,6 +112,12 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         if(v.getId() == R.id.buttonSaveData){
             // gửi 1 tín hiệu cho biết chuyển từ màn hình result
+            ProgressDialog progress = new ProgressDialog(this);
+            progress.setTitle("Processing");
+            progress.setMessage("...");
+            progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+            progress.show();
+
 
             Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
             Uri URI_OriginalImage = (Uri)getIntent().getParcelableExtra("imageURI");
@@ -119,6 +126,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
             //getIntent().getSerializableExtra("Save As");
 
             //getIntent().getParcelableExtra("OriginalImage");
+            progress.dismiss();
             startActivity(intent);
         }
     }
@@ -146,14 +154,13 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     imgData.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
                     imgData.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
                 }
-
             }
         }
     }
 
     private void Classify(){
-        // get current bitmap from imageView
-        Bitmap bitmap_orig = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+        // get current bitmap from photoView
+        Bitmap bitmap_orig = ((BitmapDrawable)photoView.getDrawable()).getBitmap();
 
         // convert bitmap to byte array
         convertBitmapToByteBuffer(bitmap_orig);

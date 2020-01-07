@@ -59,6 +59,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:entries="@array/spinner_sex_type"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="20dp"/>
+
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:id="@+id/info_textinputlayout_DateOfBirth"
@@ -74,10 +80,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
-        <ImageView
+
+        <com.github.chrisbanes.photoview.PhotoView
+            android:id="@+id/info_photoview_OriginalImage"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/info_imageview_OriginalImage"/>
+            android:layout_height="match_parent"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -93,6 +100,12 @@
                 android:id="@+id/info_spinner_result"
                 android:entries="@array/spinner_classification_result"/>
         </LinearLayout>
+
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -142,33 +155,73 @@
             </LinearLayout>
         </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/info_textinputlayout_BloodSugar"
-            android:layout_width="200dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Blood Sugar"
-            app:errorEnabled="true"
-            app:suffixText="mg/dL">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/info_textinputedittext_BloodSugar"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:id="@+id/info_textinputlayout_BloodSugar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Blood Sugar"
+                app:errorEnabled="true"
+                app:suffixText="mg/dL"
+                android:layout_weight="1">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/info_textinputedittext_BloodSugar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Blood Sugar"
+                app:errorEnabled="true"
+                app:suffixText="mg/dL"
+                android:layout_weight="1"
+                android:visibility="invisible">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/info_textinputlayout_Hba1c"
-            android:layout_width="200dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Hba1c"
-            app:errorEnabled="true"
-            app:suffixText="%">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/info_textinputedittext_Hba1c"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="horizontal">
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:id="@+id/info_textinputlayout_Hba1c"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Hba1c"
+                app:errorEnabled="true"
+                app:suffixText="%"
+                android:layout_weight="1">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/info_textinputedittext_Hba1c"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Hba1c"
+                app:errorEnabled="true"
+                app:suffixText="%"
+                android:layout_weight="1"
+                android:visibility="invisible">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -211,8 +264,9 @@
                     android:layout_weight="1">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/info_textinputedittext_LDL"
-                        android:layout_width="200dp"
-                        android:layout_height="wrap_content" />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
@@ -260,14 +314,6 @@
                     android:gravity="top"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
-
-
-
-
-
-
-
-
     </LinearLayout>
 
 </ScrollView>
