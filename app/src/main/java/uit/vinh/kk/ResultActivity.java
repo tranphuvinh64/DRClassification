@@ -15,13 +15,23 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.util.Util;
 import com.github.chrisbanes.photoview.PhotoView;
+
+import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
 public class ResultActivity extends AppCompatActivity implements View.OnClickListener {
+    private  Uri uri;
     // presets for rgb conversion
     private static final int RESULTS_TO_SHOW = 3;
     private static final int IMAGE_MEAN = 128;
@@ -50,6 +60,12 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     private Bitmap rgbFrameBitmap = null;
     private Classifier classifier;
     private Integer sensorOrientation = 0;
+    static {
+        if(!OpenCVLoader.initDebug())
+            Log.d("...", "OpenCv load fail!");
+        else
+            Log.d("...", "OpenCv success.");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -82,8 +98,9 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         recognition4TextView.setText("Level 4");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Uri uri = (Uri)getIntent().getParcelableExtra("imageURI");
+        uri = (Uri)getIntent().getParcelableExtra("imageURI");
         photoView.setImageURI(uri);
+
         // put function classify here
         Classify();
 
@@ -102,11 +119,33 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
             case android.R.id.home:
                 ResultActivity.super.onBackPressed();
                 return true;
+            case R.id.contrastenhance:
+                Bitmap contrastEnhnaceBitmap = contrastEnhance(((BitmapDrawable)photoView.getDrawable()).getBitmap());
+                photoView.setImageBitmap(contrastEnhnaceBitmap);
+                break;
+            case R.id.originalimage:
+                photoView.setImageURI(uri);
+                break;
             default:break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private Bitmap contrastEnhance(Bitmap bitmapsrc){
+        // convert Color bitmapsrc to RGB
+        Mat image  = new Mat();
+        Mat matsrc = new Mat();
+        Mat matdest = new Mat();
+        Mat gaussianBlurSrc = new Mat();
+        Bitmap bpm32 = bitmapsrc.copy(Bitmap.Config.ARGB_8888,true);
+        Utils.bitmapToMat(bpm32,matsrc);
+        Imgproc.cvtColor(matsrc,image, Imgproc.COLOR_BGR2RGB);
+        org.opencv.core.Size s = new Size(0,0);
+        Imgproc.GaussianBlur(matsrc,gaussianBlurSrc,s,10);
+        Core.addWeighted(matsrc,4,gaussianBlurSrc,-4,128,matdest);
+        Utils.matToBitmap(matdest,bitmapsrc);
+        return bitmapsrc;
+    }
 
     @Override
     public void onClick(View v) {

@@ -5,21 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/photoview"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         android:background="@color/blackBackground"/>
+
+
     <LinearLayout
         android:id="@+id/gesture_layout"
+        android:layout_height="0dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:orientation="vertical"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:layout_marginTop="30dp">
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -133,18 +136,16 @@
 
         </LinearLayout>
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center|bottom">
-        <Button
-            android:id="@+id/buttonSaveData"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:textColor="@color/ef_white"
-            android:text="Save" />
-    </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonSaveData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/ef_white"
+        android:text="Save"
+        android:layout_gravity="center"/>
+
 
 
 

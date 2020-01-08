@@ -96,6 +96,7 @@ public class SaveActivity extends AppCompatActivity {
         textInputEditText_MedicalHistory = findViewById(R.id.info_textinputedittext_MedicalHistory);
         textInputEditText_Note = findViewById(R.id.info_textinputedittext_Note);
 
+
         textInputLayout_Today = findViewById(R.id.info_textinputlayout_Today);
         textInputLayout_PatientName = findViewById(R.id.info_textinputlayout_PatientName);
         textInputLayout_DateOfBirth = findViewById(R.id.info_textinputlayout_DateOfBirth);
@@ -108,7 +109,6 @@ public class SaveActivity extends AppCompatActivity {
         textInputLayout_LDL = findViewById(R.id.info_textinputlayout_LDL);
         textInputLayout_MedicalHistory = findViewById(R.id.info_textinputlayout_MedicalHistory);
         textInputLayout_Note = findViewById(R.id.info_textinputlayout_MedicalHistory);
-
 
 
         textInputLayout_Today.setEndIconOnClickListener(new View.OnClickListener() {

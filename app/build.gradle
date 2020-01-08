@@ -65,5 +65,6 @@ dependencies {
     // zoom image
     //implementation 'com.github.chrisbanes:PhotoView:latest.release.here'
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
+    implementation project(path: ':openCVLibrary349')
 
 }
