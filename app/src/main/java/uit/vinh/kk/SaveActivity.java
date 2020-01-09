@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +28,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -71,6 +73,7 @@ public class SaveActivity extends AppCompatActivity {
     private Spinner spinner_result;
 
     private PhotoView photoViewOriginalImage;
+    private PhotoView photoViewContrastEnhnace;
     private ImageView imageViewOriginalImage;
     private File directory;
     private Thread saveImageThread;
@@ -152,12 +155,15 @@ public class SaveActivity extends AppCompatActivity {
 
 
         photoViewOriginalImage = findViewById(R.id.info_photoview_OriginalImage);
+        photoViewContrastEnhnace = findViewById(R.id.info_photoview_ContrastEnhance);
         //imageViewOriginalImage = findViewById(R.id.info_imageview_OriginalImage);
 
         formDatabase = new DatabaseHelper(this);
 
         String SaveAs = (String) getIntent().getSerializableExtra("Save As");
         if (SaveAs.equals(CONSTANTS.SAVE_AS_MODE_EDIT)){
+            photoViewContrastEnhnace.setVisibility(View.GONE);
+            photoViewOriginalImage.setVisibility(View.GONE);
             Form oldForm = (Form)getIntent().getSerializableExtra("oldform");
             textInputEditText_Today.setText(oldForm.getToday());
             textInputEditText_PatientName.setText(oldForm.getName());
@@ -180,10 +186,19 @@ public class SaveActivity extends AppCompatActivity {
             SimpleDateFormat sdfToday = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
             textInputEditText_Today.setText(sdfToday.format(new Date()));
             Log.d("debug", "onCreate: Save as Mode new");
-            // auto get ngày hôm nay set vào edittext
-            Uri URIOriginalImage = (Uri) getIntent().getParcelableExtra("URIOriginalImage");
-            //imageViewOriginalImage.setImageURI(URIOriginalImage);
-            photoViewOriginalImage.setImageURI(URIOriginalImage);
+            //Uri URIOriginalImage = (Uri) getIntent().getParcelableExtra("URIOriginalImage");
+            String originalImagePath = (String)getIntent().getSerializableExtra("ImagePath");
+            float scale = (float) getIntent().getSerializableExtra("scalevalue");
+            Bitmap bitmapOriginalImage = null;
+            try {
+                bitmapOriginalImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(),Uri.parse("file://"+ originalImagePath));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(bitmapOriginalImage!=null ){
+                bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage,(int)(bitmapOriginalImage.getWidth()*scale) ,(int)(bitmapOriginalImage.getHeight()*scale) ,true );
+                photoViewOriginalImage.setImageBitmap(bitmapOriginalImage);
+            }
         }
         // bắt sự kiện bấm button hiện calendar
 
@@ -272,28 +287,29 @@ public class SaveActivity extends AppCompatActivity {
                 SaveActivity.super.onBackPressed();
                 return true;
             case R.id.menu_save:
-                long startTime = System.nanoTime();
                 // save data with multithread
                 //saveImageThread.start();
+                ProgressDialog mProgressDialog = ProgressDialog.show(this, "Please wait","Saving data", true);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        WithoutMultiThread();
+                        try {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mProgressDialog.dismiss();
+                                    Toast.makeText(getApplicationContext(), "Infomation has been saved successfully", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // xóa các màn hình trước
+                                    startActivity(intent);
+                                }
+                            });
+                        } catch (final Exception ex) {
 
-                ProgressDialog progress = new ProgressDialog(this);
-                progress.setTitle("Processing");
-                progress.setMessage("Saving data...");
-                progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-                progress.show();
-                // save data without multithread
-                WithoutMultiThread();
-                progress.dismiss();
-                long endTime = System.nanoTime();
-                Log.d("debug", "onOptionsItemSelected: Main thread ended");
-                Log.d("debug", "onOptionsItemSelected: With Multithread time is :" + (endTime - startTime )/1000);
-                // hiển thị Toast thông báo đã lưu
-                Toast.makeText(getApplicationContext(), "Infomation has been saved successfully", Toast.LENGTH_SHORT).show();
-                // chuyển về màn hình chính
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // xóa các màn hình trước
-                startActivity(intent);
-                // mở xml và lưu
+                        }
+                    }
+                }.start();
                 break;
             default:break;
         }

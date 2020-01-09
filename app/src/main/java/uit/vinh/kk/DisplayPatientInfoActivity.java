@@ -1,8 +1,10 @@
 package uit.vinh.kk;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +18,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+
+import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
+import java.io.IOException;
 
 public class DisplayPatientInfoActivity extends AppCompatActivity{
 
@@ -54,7 +65,14 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
     private Spinner spinner_result;
 
     private PhotoView photoViewOriginalImage;
+    private PhotoView photoViewContrastEnhnace;
     private ImageView imageViewOriginalImage;
+    static {
+        if(!OpenCVLoader.initDebug())
+            Log.d("...", "OpenCv load fail!");
+        else
+            Log.d("...", "OpenCv success.");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -94,6 +112,7 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
 
 
         photoViewOriginalImage = findViewById(R.id.info_photoview_OriginalImage);
+        photoViewContrastEnhnace = findViewById(R.id.info_photoview_ContrastEnhance);
 
 //        textView.setTag(textView.getKeyListener());
 //        textView.setKeyListener(null);
@@ -141,19 +160,25 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         spinner_result.setSelection(((ArrayAdapter)spinner_result.getAdapter()).getPosition(prevForm.getClassificationResult()));
         spinner_sex.setSelection(((ArrayAdapter)spinner_sex.getAdapter()).getPosition(prevForm.getSex()));
 
-        //byte[] bitmapdata = prevForm.getBytearrOriginalImage();
-        //Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
-        //imageViewOriginalImage.setImageBitmap(bitmap);
-
-        Log.d("debug", "onCreate: uri == " + prevForm.getPathOriginalImage());
-        if (prevForm.getPathOriginalImage().equals("null") == false){
-            Uri uri = Uri.parse(prevForm.getPathOriginalImage());
-            Log.d("debug", "onCreate: uri == " + uri);
-            if (uri != null ){
-                //imageViewOriginalImage.setImageURI(uri);
-                photoViewOriginalImage.setImageURI(uri);
+        Log.d("debug", "onCreate: image Path  == " + prevForm.getPathOriginalImage());
+        Bitmap bitmapOriginalImage = null;
+        try {
+            bitmapOriginalImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(),Uri.parse("file://"+prevForm.getPathOriginalImage()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(bitmapOriginalImage!=null){
+            if (bitmapOriginalImage.getHeight()>CONSTANTS.MAX_HEIGHT || bitmapOriginalImage.getWidth()>CONSTANTS.MAX_WIDTH){
+                float scale = (float) 1.0;
+                for (float i = 0; i <= 1.0 ; i = i + (float)0.05){
+                    if(bitmapOriginalImage.getWidth()*i<=CONSTANTS.MAX_WIDTH && bitmapOriginalImage.getHeight()*i<=CONSTANTS.MAX_HEIGHT){
+                        scale = i;
+                    }
+                }
+                bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage,(int)(bitmapOriginalImage.getWidth()*scale) ,(int)(bitmapOriginalImage.getHeight()*scale) ,true );
             }
-
+            photoViewOriginalImage.setImageBitmap(bitmapOriginalImage);
+            photoViewContrastEnhnace.setImageBitmap(contrastEnhance(bitmapOriginalImage));
         }
     }
 
@@ -185,5 +210,20 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_actionbar_edit, menu);
         return true;
+    }
+    private Bitmap contrastEnhance(Bitmap bitmapsrc){
+        Mat image  = new Mat();
+        Mat matsrc = new Mat();
+        Mat matdest = new Mat();
+        Mat gaussianBlurSrc = new Mat();
+        Bitmap bpm32 = bitmapsrc.copy(Bitmap.Config.ARGB_8888,true);
+        Utils.bitmapToMat(bpm32,matsrc);
+        Imgproc.cvtColor(matsrc,image, Imgproc.COLOR_BGR2RGB);
+        org.opencv.core.Size s = new Size(0,0);
+        Imgproc.GaussianBlur(matsrc,gaussianBlurSrc,s,10);
+        Core.addWeighted(matsrc,4,gaussianBlurSrc,-4,128,matdest);
+        Bitmap bitmapdest = Bitmap.createBitmap(matdest.cols(),matdest.rows(),Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(matdest,bitmapdest);
+        return bitmapdest;
     }
 }

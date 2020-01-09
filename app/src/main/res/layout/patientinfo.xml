@@ -84,7 +84,16 @@
         <com.github.chrisbanes.photoview.PhotoView
             android:id="@+id/info_photoview_OriginalImage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="200dp"
+            android:background="@color/blackBackground"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp"/>
+        <com.github.chrisbanes.photoview.PhotoView
+            android:id="@+id/info_photoview_ContrastEnhance"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@color/blackBackground"/>
 
         <LinearLayout
             android:layout_width="wrap_content"

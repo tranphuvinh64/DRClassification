@@ -2,6 +2,7 @@ package uit.vinh.kk;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,6 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -43,6 +45,7 @@ import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -57,18 +60,12 @@ import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Serializable {
-    public Handler handler;
     public static final int REQUEST_PERMISSION = 300;
-    // for permission requests access camera
-    public static final int REQUEST_PERMISSION_CAMERA = 0;
-    // for permission write external storage
-    public static final int REQUEST_PERMISSION_WRITE = 1;
-    // for permission read external storage
-    public static final int REQUEST_PERMISSION_READ = 2;
     // request code for permission requests to the os for image
     public static final int REQUEST_IMAGE = 100;
     // will hold uri of image obtained from camera
     private Uri imageUri;
+    private String imagePath;
     static DatabaseHelper formDatabase ;
     ArrayList<DataModel> dataModels;
     //private static ArrayList<Form> listForm = loadXMLData("//storage//emulated//0//patientData");
@@ -101,8 +98,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         // initial components
         setContentView(R.layout.activity_main);
+
+
         if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, REQUEST_IMAGE);
+            ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, REQUEST_PERMISSION);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_PERMISSION);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
@@ -110,11 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         REQUEST_PERMISSION);
             }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                    && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        REQUEST_PERMISSION);
-            }
+
         // temp
         rgbFrameBitmap = Bitmap.createBitmap(640,480,Bitmap.Config.ARGB_8888);
 
@@ -210,15 +210,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        handler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                if (msg.what == 100){
-                    Log.d(TAG, "handleMessage: MainActivity save data successfully ");
-                }
-            }
-        };
+
     }
 
 
@@ -274,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if (requestCode == REQUEST_PERMISSION) {
             if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 Toast.makeText(getApplicationContext(),"This application needs read, write, and camera permissions to run. Application now closing.",Toast.LENGTH_LONG);
@@ -330,7 +323,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if(v.getId() == R.id.usecamera_floating_action_button ){
             animateFAB();
-            // request permission to use the camera on the user's phone
             // Open Camera
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.TITLE, "New Picture");
@@ -349,25 +341,76 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
-        if (ImagePicker.shouldHandle(requestCode, resultCode, data) == true || resultCode == RESULT_OK){
-            Image images = ImagePicker.getFirstImageOrNull(data);
-            if (images != null){
-                imageUri = Uri.parse(images.getPath());
-            }
-            if(imageUri!=null){
-                Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
-                intent.putExtra("imageURI", imageUri);
-                startActivity(intent);
-            }
-            else{
-                Toast.makeText(MainActivity.this,"No image found", Toast.LENGTH_SHORT);
-            }
+        if (ImagePicker.shouldHandle(requestCode, resultCode, data) == true){
+            ProgressDialog mProgressDialog = ProgressDialog.show(this, "Please wait","Long operation starts...", true);
+            new Thread() {
+                @Override
+                public void run() {
+                    Image images = ImagePicker.getFirstImageOrNull(data);
+                    if (images != null){
+                        imagePath = images.getPath();
+                    }
+                    Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
+                    intent.putExtra("ImagePath", imagePath);
+                    startActivity(intent);
+                    try {
 
+                        // code runs in a thread
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mProgressDialog.dismiss();
+                            }
+                        });
+                    } catch (final Exception ex) {
+                    }
+                }
+            }.start();
+
+        }
+        if ( requestCode == REQUEST_IMAGE && resultCode == RESULT_OK){
+            ProgressDialog mProgressDialog = ProgressDialog.show(this, "Please wait","Classifying", true);
+            new Thread() {
+                @Override
+                public void run() {
+                    imagePath = getRealPathFromURI(imageUri);
+                    Log.d(TAG, "selected image from camera ");
+                    Log.d(TAG, "onActivityResult: imageUri == " + imageUri);
+                    Log.d(TAG, "onActivityResult: real path == "+ getRealPathFromURI(imageUri));
+                    Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
+                    intent.putExtra("ImagePath", imagePath);
+                    startActivity(intent);
+                    try {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mProgressDialog.dismiss();
+                            }
+                        });
+                    } catch (final Exception ex) {
+
+                    }
+                }
+            }.start();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
+    private String getRealPathFromURI(Uri contentUri)
+    {
+        try
+        {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            Cursor cursor = this.getContentResolver().query(contentUri, proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        }
+        catch (Exception e)
+        {
+            return contentUri.getPath();
+        }
+    }
     private static ArrayList<Form> loadSQLiteData(){
         Cursor res = formDatabase.loadData();
         ArrayList<Form> listForm = new ArrayList<>();

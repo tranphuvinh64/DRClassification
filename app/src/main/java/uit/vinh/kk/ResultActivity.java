@@ -1,17 +1,21 @@
 package uit.vinh.kk;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,7 +35,9 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public class ResultActivity extends AppCompatActivity implements View.OnClickListener {
-    private  Uri uri;
+    float scale =  1;
+    Bitmap bitmapOriginalImage =null;
+    private String imagePath;
     // presets for rgb conversion
     private static final int RESULTS_TO_SHOW = 3;
     private static final int IMAGE_MEAN = 128;
@@ -72,6 +78,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         // initialize array that holds image data
         intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
         setContentView(R.layout.activity_classificationresult);
+
         photoView = findViewById(R.id.photoview);
         buttonSave = findViewById(R.id.buttonSaveData);
         buttonSave.setOnClickListener(this);
@@ -98,12 +105,34 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         recognition4TextView.setText("Level 4");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        uri = (Uri)getIntent().getParcelableExtra("imageURI");
-        photoView.setImageURI(uri);
+        imagePath = (String)getIntent().getSerializableExtra("ImagePath");
+        try {
+            bitmapOriginalImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(),Uri.parse("file://"+imagePath));
+            if(bitmapOriginalImage!=null){
+                if (bitmapOriginalImage.getHeight()>CONSTANTS.MAX_HEIGHT || bitmapOriginalImage.getWidth()>CONSTANTS.MAX_WIDTH){
+                    Log.d("debug", "onCreate: original size " + bitmapOriginalImage.getWidth() + "---" + bitmapOriginalImage.getHeight());
+                    scale = (float) 1.0;
+                    for (float i = 0; i <= 1 ; i = i + (float)0.05){
+                        if(bitmapOriginalImage.getWidth()*i<=CONSTANTS.MAX_WIDTH && bitmapOriginalImage.getHeight()*i<=CONSTANTS.MAX_HEIGHT){
+                            scale = i;
+                        }
+                    }
+                    Log.d("debug", "onCreate: selected scale == " + scale);
+                    bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage,(int)(bitmapOriginalImage.getWidth()*scale) ,(int)(bitmapOriginalImage.getHeight()*scale) ,true );
+                }
+                Log.d("debug", "onCreate: bitmap is not null");
+                Log.d("debug", "onCreate: new bitmaporiginal size " + bitmapOriginalImage.getWidth() + "---" + bitmapOriginalImage.getHeight());
+                photoView.setImageBitmap(bitmapOriginalImage);
+            }
+            else{
+                Log.d("debug", "onCreate: bitmap is null");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        // put function classify here
+
         Classify();
-
     }
 
     @Override
@@ -120,11 +149,17 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                 ResultActivity.super.onBackPressed();
                 return true;
             case R.id.contrastenhance:
-                Bitmap contrastEnhnaceBitmap = contrastEnhance(((BitmapDrawable)photoView.getDrawable()).getBitmap());
-                photoView.setImageBitmap(contrastEnhnaceBitmap);
+                if(bitmapOriginalImage != null){
+                    Bitmap contrastEnhnaceBitmap = contrastEnhance(bitmapOriginalImage);
+                    photoView.setImageBitmap(contrastEnhnaceBitmap);
+                }
+
                 break;
             case R.id.originalimage:
-                photoView.setImageURI(uri);
+                if(bitmapOriginalImage != null){
+                    photoView.setImageBitmap(bitmapOriginalImage);
+                }
+                //photoView.setImageURI(uri);
                 break;
             default:break;
         }
@@ -132,7 +167,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private Bitmap contrastEnhance(Bitmap bitmapsrc){
-        // convert Color bitmapsrc to RGB
+
         Mat image  = new Mat();
         Mat matsrc = new Mat();
         Mat matdest = new Mat();
@@ -143,30 +178,41 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         org.opencv.core.Size s = new Size(0,0);
         Imgproc.GaussianBlur(matsrc,gaussianBlurSrc,s,10);
         Core.addWeighted(matsrc,4,gaussianBlurSrc,-4,128,matdest);
-        Utils.matToBitmap(matdest,bitmapsrc);
-        return bitmapsrc;
+        Bitmap bitmapdest = Bitmap.createBitmap(matdest.cols(),matdest.rows(),Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(matdest,bitmapdest);
+        return bitmapdest;
     }
 
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.buttonSaveData){
             // gửi 1 tín hiệu cho biết chuyển từ màn hình result
-            ProgressDialog progress = new ProgressDialog(this);
-            progress.setTitle("Processing");
-            progress.setMessage("...");
-            progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-            progress.show();
 
+           ProgressDialog mProgressDialog = ProgressDialog.show(this, "Please wait","Long operation starts...", true);
+            new Thread() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
+                    String temp = (String)getIntent().getSerializableExtra("ImagePath");
+                    intent.putExtra("ImagePath", temp);
+                    intent.putExtra("scalevalue", scale);
+                    intent.putExtra("Save As", CONSTANTS.SAVE_AS_MODE_NEW);
 
-            Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
-            Uri URI_OriginalImage = (Uri)getIntent().getParcelableExtra("imageURI");
-            intent.putExtra("URIOriginalImage", URI_OriginalImage);
-            intent.putExtra("Save As", CONSTANTS.SAVE_AS_MODE_NEW);
-            //getIntent().getSerializableExtra("Save As");
+                    try {
 
-            //getIntent().getParcelableExtra("OriginalImage");
-            progress.dismiss();
-            startActivity(intent);
+                        // code runs in a thread
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mProgressDialog.dismiss();
+                                startActivity(intent);
+                            }
+                        });
+                    } catch (final Exception ex) {
+
+                    }
+                }
+            }.start();
         }
     }
 
@@ -200,6 +246,9 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     private void Classify(){
         // get current bitmap from photoView
         Bitmap bitmap_orig = ((BitmapDrawable)photoView.getDrawable()).getBitmap();
+
+
+        // ttrường hợp nếu photoView không có ảnh: -> 5 giá trị xác suất đều là 0%
 
         // convert bitmap to byte array
         convertBitmapToByteBuffer(bitmap_orig);

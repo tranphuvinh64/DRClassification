@@ -59,4 +59,8 @@ public final class CONSTANTS {
 
     //
     public static final String FOLDER_PATH_STORE_IMG = Environment.getExternalStorageDirectory()+ File.separator + STORE_IMG_FOLDER_NAME;
+
+    public static final int MAX_HEIGHT = 4500;
+    public static final int MAX_WIDTH = 6300;
+
 }
