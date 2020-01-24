@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -10,19 +11,17 @@
         android:id="@+id/photoview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:background="@color/blackBackground" />
-
 
     <LinearLayout
         android:id="@+id/gesture_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:paddingTop="10dp"
         android:paddingStart="20dp"
+        android:paddingTop="10dp"
         android:paddingEnd="20dp"
         android:paddingBottom="10dp">
 
@@ -33,19 +32,13 @@
 
             <TextView
                 android:id="@+id/detected_item"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                style="@style/TextView.Result"
+                tools:text="abc" />
 
             <TextView
                 android:id="@+id/detected_item_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
-
+                style="@style/TextView.Result.Value"
+                tools:text="0.0" />
         </LinearLayout>
 
         <LinearLayout
@@ -56,18 +49,13 @@
 
             <TextView
                 android:id="@+id/detected_item1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                style="@style/TextView.Result"
+                tools:text="abc" />
 
             <TextView
                 android:id="@+id/detected_item1_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                style="@style/TextView.Result.Value"
+                tools:text="0.0" />
 
         </LinearLayout>
 
@@ -79,18 +67,13 @@
 
             <TextView
                 android:id="@+id/detected_item2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                style="@style/TextView.Result"
+                tools:text="abc" />
 
             <TextView
                 android:id="@+id/detected_item2_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                style="@style/TextView.Result.Value"
+                tools:text="0.0" />
 
         </LinearLayout>
 
@@ -102,18 +85,13 @@
 
             <TextView
                 android:id="@+id/detected_item3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                style="@style/TextView.Result"
+                tools:text="abc" />
 
             <TextView
                 android:id="@+id/detected_item3_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                style="@style/TextView.Result.Value"
+                tools:text="0.0" />
 
         </LinearLayout>
 
@@ -125,29 +103,34 @@
 
             <TextView
                 android:id="@+id/detected_item4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                style="@style/TextView.Result"
+                tools:text="abc" />
 
             <TextView
                 android:id="@+id/detected_item4_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                style="@style/TextView.Result.Value"
+                tools:text="0.0" />
 
         </LinearLayout>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/buttonSaveData"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@color/colorPrimary"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:text="Save"
-        android:textColor="@color/ef_white" />
+        android:gravity="center">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonSaveData"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@color/colorPrimary"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:text="Save"
+            android:textAllCaps="false"
+            android:textColor="@color/ef_white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 </LinearLayout>
