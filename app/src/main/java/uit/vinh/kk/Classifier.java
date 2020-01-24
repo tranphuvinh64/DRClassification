@@ -5,6 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.os.SystemClock;
 import android.os.Trace;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
@@ -21,11 +25,16 @@ import org.tensorflow.lite.support.image.ops.Rot90Op;
 import org.tensorflow.lite.support.label.TensorLabel;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -39,9 +48,21 @@ public class Classifier {
     private final int imageSizeX;
 
 
+    private float[][] labelProbArray = null;
+    private static final int RESULTS_TO_SHOW = 5;
+    // priority queue that will hold the top results from the CNN
+    private PriorityQueue<Map.Entry<String, Float>> sortedLabels =
+            new PriorityQueue<>(
+                    RESULTS_TO_SHOW,
+                    new Comparator<Map.Entry<String, Float>>() {
+                        @Override
+                        public int compare(Map.Entry<String, Float> o1, Map.Entry<String, Float> o2) {
+                            return (o1.getValue()).compareTo(o2.getValue());
+                        }
+                    });
 
 
-
+    private List<String> labelList;
 
 
 
@@ -109,7 +130,10 @@ public class Classifier {
         int[] imageShape = tflite.getInputTensor(imageTensorIndex).shape(); // {1, height, width, 3}
         imageSizeY = imageShape[1];
         imageSizeX = imageShape[2];
+        Log.d("debug", "Classifier: imageSizeX == " + imageSizeX);
+        Log.d("debug", "Classifier: imageSizeY == " + imageSizeY);
         DataType imageDataType = tflite.getInputTensor(imageTensorIndex).dataType();
+        Log.d("debug", "Classifier: Datatype " + imageDataType.toString());
         int probabilityTensorIndex = 0;
         int[] probabilityShape =
                 tflite.getOutputTensor(probabilityTensorIndex).shape(); // {1, NUM_CLASSES}
@@ -123,6 +147,14 @@ public class Classifier {
 
         // Creates the post processor for the output probability.
         probabilityProcessor = new TensorProcessor.Builder().add(getPostprocessNormalizeOp()).build();
+
+        labelProbArray = new float[1][5];
+        labelList = new ArrayList<String>();
+        labelList.add("No DR");
+        labelList.add("Mild");
+        labelList.add("Moderate");
+        labelList.add("Severe");
+        labelList.add("Proliferative");
 
     }
 
@@ -228,6 +260,9 @@ public class Classifier {
         Trace.beginSection("runInference");
         long startTimeForReference = SystemClock.uptimeMillis();
         tflite.run(inputImageBuffer.getBuffer(), outputProbabilityBuffer.getBuffer().rewind());
+
+        Log.d("debug", "recognizeImage: outputProbabilityBuffer.getBuffer().rewind() == " + outputProbabilityBuffer.getBuffer().rewind().getClass());
+        Log.d("debug", "recognizeImage: inputImageBuffer.getBuffer == " + inputImageBuffer.getBuffer().getClass());
         long endTimeForReference = SystemClock.uptimeMillis();
         Trace.endSection();
         LOGGER.v("Timecost to run model inference: " + (endTimeForReference - startTimeForReference));
@@ -236,12 +271,33 @@ public class Classifier {
         Map<String, Float> labeledProbability =
                 new TensorLabel(labels, probabilityProcessor.process(outputProbabilityBuffer))
                         .getMapWithFloatValue();
+        Log.d("debug", "recognizeImage: labels == "+ labels);
+        Log.d("", "recognizeImage: probabilityProcessor.process(outputProbabilityBuffer)" + probabilityProcessor.process(outputProbabilityBuffer));
         Trace.endSection();
+
+//        // test another code about classify
+//        tflite.run(inputImageBuffer.getBuffer(), labelProbArray);
+//        tempPrintTopKLabels();
 
         // Gets top-k results.
         return getTopKProbability(labeledProbability);
     }
 
+    private void tempPrintTopKLabels (){
+        for(int i = 0; i<5; i++){
+            sortedLabels.add(
+                    new AbstractMap.SimpleEntry<>(labelList.get(i), labelProbArray[0][i]));
+        }
+        final int size = sortedLabels.size();
+        for (int i = 0; i < size; ++i) {
+            Map.Entry<String, Float> label = sortedLabels.poll();
+            String[] topLables = new String[5];
+            String[] topConfidence = new String[5];
+            topLables[i] = label.getKey();
+            topConfidence[i] = String.format("%.0f%%",label.getValue()*100);
+            Log.d("debug", "tempPrintTopKLabels: vinhdeptrai " + topLables[i] + "----" + topConfidence[i]);
+        }
+    }
     /** Gets the top-k results. */
     private static List<Recognition> getTopKProbability(Map<String, Float> labelProb) {
         // Find the best classifications.

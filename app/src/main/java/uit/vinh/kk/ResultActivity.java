@@ -35,8 +35,10 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public class ResultActivity extends AppCompatActivity implements View.OnClickListener {
+    ProgressDialog dialogLoadActivity = null;
     float scale =  1;
     Bitmap bitmapOriginalImage =null;
+    Bitmap bitmapContrastEnhance = null;
     private String imagePath;
     // presets for rgb conversion
     private static final int RESULTS_TO_SHOW = 3;
@@ -106,33 +108,53 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         imagePath = (String)getIntent().getSerializableExtra("ImagePath");
-        try {
-            bitmapOriginalImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(),Uri.parse("file://"+imagePath));
-            if(bitmapOriginalImage!=null){
-                if (bitmapOriginalImage.getHeight()>CONSTANTS.MAX_HEIGHT || bitmapOriginalImage.getWidth()>CONSTANTS.MAX_WIDTH){
-                    Log.d("debug", "onCreate: original size " + bitmapOriginalImage.getWidth() + "---" + bitmapOriginalImage.getHeight());
-                    scale = (float) 1.0;
-                    for (float i = 0; i <= 1 ; i = i + (float)0.05){
-                        if(bitmapOriginalImage.getWidth()*i<=CONSTANTS.MAX_WIDTH && bitmapOriginalImage.getHeight()*i<=CONSTANTS.MAX_HEIGHT){
-                            scale = i;
+
+
+        dialogLoadActivity = ProgressDialog.show(this, "Please wait","Processing...", true);
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    bitmapOriginalImage = MediaStore.Images.Media.getBitmap(getContentResolver(),Uri.parse("file://"+imagePath));
+                    if(bitmapOriginalImage!=null){
+                        if (bitmapOriginalImage.getHeight()>CONSTANTS.MAX_HEIGHT || bitmapOriginalImage.getWidth()>CONSTANTS.MAX_WIDTH){
+                            Log.d("debug", "onCreate: original size " + bitmapOriginalImage.getWidth() + "---" + bitmapOriginalImage.getHeight());
+                            scale = (float) 1.0;
+                            for (float i = 0; i <= 1 ; i = i + (float)0.05){
+                                if(bitmapOriginalImage.getWidth()*i<=CONSTANTS.MAX_WIDTH && bitmapOriginalImage.getHeight()*i<=CONSTANTS.MAX_HEIGHT){
+                                    scale = i;
+                                }
+                            }
+                            Log.d("debug", "onCreate: selected scale == " + scale);
+                            bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage,(int)(bitmapOriginalImage.getWidth()*scale) ,(int)(bitmapOriginalImage.getHeight()*scale) ,true );
+
+                            Log.d("debug", "run: bitmap contrast enhance is " + bitmapContrastEnhance);
                         }
+                        bitmapContrastEnhance = contrastEnhance(bitmapOriginalImage);
+                        Log.d("debug", "onCreate: bitmap is not null");
+                        Log.d("debug", "onCreate: new bitmaporiginal size " + bitmapOriginalImage.getWidth() + "---" + bitmapOriginalImage.getHeight());
+
                     }
-                    Log.d("debug", "onCreate: selected scale == " + scale);
-                    bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage,(int)(bitmapOriginalImage.getWidth()*scale) ,(int)(bitmapOriginalImage.getHeight()*scale) ,true );
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                Log.d("debug", "onCreate: bitmap is not null");
-                Log.d("debug", "onCreate: new bitmaporiginal size " + bitmapOriginalImage.getWidth() + "---" + bitmapOriginalImage.getHeight());
-                photoView.setImageBitmap(bitmapOriginalImage);
-            }
-            else{
-                Log.d("debug", "onCreate: bitmap is null");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
+                try {
 
-        Classify();
+                    // code runs in a thread
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            photoView.setImageBitmap(bitmapOriginalImage);
+                            Classify();
+                           dialogLoadActivity.dismiss();
+                        }
+                    });
+                } catch (final Exception ex) {
+
+                }
+            }
+        }.start();
     }
 
     @Override
@@ -140,6 +162,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         getMenuInflater().inflate(R.menu.menu_back_menuitem, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -150,8 +173,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                 return true;
             case R.id.contrastenhance:
                 if(bitmapOriginalImage != null){
-                    Bitmap contrastEnhnaceBitmap = contrastEnhance(bitmapOriginalImage);
-                    photoView.setImageBitmap(contrastEnhnaceBitmap);
+                    photoView.setImageBitmap(bitmapContrastEnhance);
                 }
 
                 break;
@@ -167,7 +189,6 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private Bitmap contrastEnhance(Bitmap bitmapsrc){
-
         Mat image  = new Mat();
         Mat matsrc = new Mat();
         Mat matdest = new Mat();
@@ -186,9 +207,8 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.buttonSaveData){
-            // gửi 1 tín hiệu cho biết chuyển từ màn hình result
 
-           ProgressDialog mProgressDialog = ProgressDialog.show(this, "Please wait","Long operation starts...", true);
+            dialogLoadActivity = ProgressDialog.show(this, "Please wait","Preparing data...", true);
             new Thread() {
                 @Override
                 public void run() {
@@ -197,15 +217,21 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     intent.putExtra("ImagePath", temp);
                     intent.putExtra("scalevalue", scale);
                     intent.putExtra("Save As", CONSTANTS.SAVE_AS_MODE_NEW);
-
+                    startActivity(intent);
+                    try {
+                        Thread.sleep(1300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     try {
 
                         // code runs in a thread
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mProgressDialog.dismiss();
-                                startActivity(intent);
+//                                dialogLoadActivity.dismiss();
+//                                startActivity(intent);
+                                dialogLoadActivity.dismiss();
                             }
                         });
                     } catch (final Exception ex) {
@@ -213,6 +239,8 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 }
             }.start();
+
+
         }
     }
 
@@ -247,8 +275,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         // get current bitmap from photoView
         Bitmap bitmap_orig = ((BitmapDrawable)photoView.getDrawable()).getBitmap();
 
-
-        // ttrường hợp nếu photoView không có ảnh: -> 5 giá trị xác suất đều là 0%
+        // trường hợp nếu photoView không có ảnh: -> 5 giá trị xác suất đều là 0%
 
         // convert bitmap to byte array
         convertBitmapToByteBuffer(bitmap_orig);

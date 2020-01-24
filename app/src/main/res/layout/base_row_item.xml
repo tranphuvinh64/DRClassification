@@ -27,42 +27,51 @@
             android:text="N"/>
     </RelativeLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_gravity="right"
         android:layout_marginLeft="15dp">
 
-
-        <TextView
-            android:id="@+id/row_item_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:text="Trần Văn ABCEFGH"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@android:color/black"
-            android:textSize="18dp"/>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/row_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="Trần Văn ABCEFGH"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@android:color/black"
+        android:textSize="18dp"
+        android:layout_weight="3"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right">
         <TextView
             android:id="@+id/row_item_study_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Study date"
-            android:layout_marginLeft="220dp"/>
-        <TextView
-            android:id="@+id/row_item_DoB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bệnh sử bệnh án"
-            android:layout_marginTop="45dp" />
+            android:text="dd/mm/yyyy"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+</LinearLayout>
         <TextView
             android:id="@+id/row_item_personalID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ngày tháng năm sinh - CMND"
-            android:layout_marginTop="25dp"/>
-    </RelativeLayout>
+            android:text="Ngày tháng năm sinh - CMND" />
+        <TextView
+            android:id="@+id/row_item_DoB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bệnh sử bệnh án" />
+
+    </LinearLayout>
 
 
 

@@ -32,11 +32,14 @@
             android:id="@+id/browseimage_linear_layout"
             android:visibility="invisible">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="110dp"
                 android:layout_height="wrap_content"
                 android:text="Upload Image"
                 android:layout_gravity="center"
-                android:id="@+id/browseimage_textview"/>
+                android:id="@+id/browseimage_textview"
+                android:background="@color/blackBackground"
+                android:textColor="@color/ef_white"
+                android:gravity="center"/>
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/browseimage_floating_action_button"
                 android:layout_width="wrap_content"
@@ -53,11 +56,14 @@
             android:visibility="invisible"
             android:id="@+id/usecamera_linear_layout">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:text="Use Camera"
                 android:layout_gravity="center"
-                android:id="@+id/usecamera_textview"/>
+                android:id="@+id/usecamera_textview"
+                android:background="@color/blackBackground"
+                android:textColor="@color/ef_white"
+                android:gravity="center"/>
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/usecamera_floating_action_button"
                 android:layout_width="wrap_content"
@@ -74,11 +80,14 @@
             android:visibility="invisible"
             android:id="@+id/info_linear_layout">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:text="Introduction"
                 android:layout_gravity="center"
-                android:id="@+id/info_textview"/>
+                android:id="@+id/info_textview"
+                android:background="@color/blackBackground"
+                android:textColor="@color/ef_white"
+                android:gravity="center"/>
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/info_floating_action_button"
                 android:layout_width="wrap_content"

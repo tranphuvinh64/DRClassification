@@ -17,7 +17,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Study Date"
-            app:errorEnabled="true"
             app:endIconMode="custom"
             app:endIconDrawable="@drawable/ic_calendar">
             <com.google.android.material.textfield.TextInputEditText
@@ -31,8 +30,7 @@
             android:id="@+id/info_textinputlayout_PatientName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Full Name"
-            app:errorEnabled="true">
+            android:hint="Full Name">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/info_textinputedittext_PatientName"
                 android:layout_width="match_parent"
@@ -45,8 +43,7 @@
             android:id="@+id/info_textinputlayout_PersonalID"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Personal ID"
-            app:errorEnabled="true">
+            android:hint="Personal ID">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/info_textinputedittext_PersonalID"
                 android:layout_width="match_parent"
@@ -70,8 +67,7 @@
             android:id="@+id/info_textinputlayout_DateOfBirth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Date of Birth (yyyy/mm/dd)"
-            app:errorEnabled="true"
+            android:hint="Date of Birth (dd/mm/yyyy)"
             app:endIconMode="custom"
             android:focusable="false"
             app:endIconDrawable="@drawable/ic_calendar">
@@ -134,7 +130,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Systolic"
-                    app:errorEnabled="true"
                     app:suffixText="mmHg"
                     android:layout_weight="1">
                     <com.google.android.material.textfield.TextInputEditText
@@ -153,7 +148,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Diastolic"
-                    app:errorEnabled="true"
                     app:suffixText="mmHg"
                     android:layout_weight="1">
                     <com.google.android.material.textfield.TextInputEditText
@@ -175,7 +169,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Blood Sugar"
-                app:errorEnabled="true"
                 app:suffixText="mg/dL"
                 android:layout_weight="1">
                 <com.google.android.material.textfield.TextInputEditText
@@ -188,7 +181,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Blood Sugar"
-                app:errorEnabled="true"
                 app:suffixText="mg/dL"
                 android:layout_weight="1"
                 android:visibility="invisible">
@@ -208,7 +200,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Hba1c"
-                app:errorEnabled="true"
                 app:suffixText="%"
                 android:layout_weight="1">
                 <com.google.android.material.textfield.TextInputEditText
@@ -221,7 +212,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Hba1c"
-                app:errorEnabled="true"
                 app:suffixText="%"
                 android:layout_weight="1"
                 android:visibility="invisible">
@@ -250,7 +240,6 @@
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:hint="HDL"
-                    app:errorEnabled="true"
                     app:suffixText="mg/dL">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/info_textinputedittext_HDL"
@@ -268,7 +257,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="LDL"
-                    app:errorEnabled="true"
                     app:suffixText="mg/dL"
                     android:layout_weight="1">
                     <com.google.android.material.textfield.TextInputEditText
@@ -292,8 +280,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:id="@+id/info_textinputlayout_MedicalHistory"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                app:errorEnabled="true">
+                android:layout_height="100dp">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/info_textinputedittext_MedicalHistory"
                     android:layout_width="match_parent"
@@ -314,8 +301,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:id="@+id/info_textinputlayout_Note"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                app:errorEnabled="true">
+                android:layout_height="100dp">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/info_textinputedittext_Note"
                     android:layout_width="match_parent"

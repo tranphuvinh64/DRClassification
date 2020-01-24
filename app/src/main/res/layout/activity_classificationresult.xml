@@ -16,7 +16,7 @@
 
     <LinearLayout
         android:id="@+id/gesture_layout"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_weight="1"
         android:orientation="vertical"
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="right"
                 android:textColor="@android:color/black"
-                android:textSize="12sp" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -55,16 +55,16 @@
                 android:id="@+id/detected_item1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/detected_item1_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -78,16 +78,16 @@
                 android:id="@+id/detected_item2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/detected_item2_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -101,15 +101,15 @@
                 android:id="@+id/detected_item3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
             <TextView
                 android:id="@+id/detected_item3_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -123,16 +123,16 @@
                 android:id="@+id/detected_item4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/detected_item4_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
         </LinearLayout>
     </LinearLayout>
@@ -144,7 +144,8 @@
         android:background="@color/colorPrimary"
         android:textColor="@color/ef_white"
         android:text="Save"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:foreground="?attr/selectableItemBackgroundBorderless"/>
 
 
 

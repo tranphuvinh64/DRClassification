@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,13 +25,21 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.chrisbanes.photoview.PhotoView;
+import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -113,6 +123,7 @@ public class SaveActivity extends AppCompatActivity {
         textInputLayout_MedicalHistory = findViewById(R.id.info_textinputlayout_MedicalHistory);
         textInputLayout_Note = findViewById(R.id.info_textinputlayout_MedicalHistory);
 
+        onTextChangeChecking();
 
         textInputLayout_Today.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,7 +135,7 @@ public class SaveActivity extends AppCompatActivity {
                     myCalendar.set(Calendar.MONTH, monthOfYear);
                     myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                     //updateLabel();
-                    String myFormat = "yyyy/MM/dd";
+                    String myFormat = CONSTANTS.DateFormat;
                     SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
                     textInputEditText_Today.setText(sdf.format(myCalendar.getTime()));
                 };
@@ -142,7 +153,7 @@ public class SaveActivity extends AppCompatActivity {
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 //updateLabel();
-                String myFormat = "yyyy/MM/dd";
+                String myFormat = CONSTANTS.DateFormat;
                 SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
                 textInputEditText_DateOfBirth.setText(sdf.format(myCalendar.getTime()));
             };
@@ -150,16 +161,16 @@ public class SaveActivity extends AppCompatActivity {
                     .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                     myCalendar.get(Calendar.DAY_OF_MONTH)).show();
         });
+
         spinner_sex = findViewById(R.id.info_spinner_sex);
         spinner_result = findViewById(R.id.info_spinner_result);
 
 
         photoViewOriginalImage = findViewById(R.id.info_photoview_OriginalImage);
         photoViewContrastEnhnace = findViewById(R.id.info_photoview_ContrastEnhance);
-        //imageViewOriginalImage = findViewById(R.id.info_imageview_OriginalImage);
+
 
         formDatabase = new DatabaseHelper(this);
-
         String SaveAs = (String) getIntent().getSerializableExtra("Save As");
         if (SaveAs.equals(CONSTANTS.SAVE_AS_MODE_EDIT)){
             photoViewContrastEnhnace.setVisibility(View.GONE);
@@ -183,7 +194,7 @@ public class SaveActivity extends AppCompatActivity {
 
         }
         else if (SaveAs.equals(CONSTANTS.SAVE_AS_MODE_NEW)){
-            SimpleDateFormat sdfToday = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+            SimpleDateFormat sdfToday = new SimpleDateFormat(CONSTANTS.DateFormat, Locale.getDefault());
             textInputEditText_Today.setText(sdfToday.format(new Date()));
             Log.d("debug", "onCreate: Save as Mode new");
             //Uri URIOriginalImage = (Uri) getIntent().getParcelableExtra("URIOriginalImage");
@@ -198,85 +209,216 @@ public class SaveActivity extends AppCompatActivity {
             if(bitmapOriginalImage!=null ){
                 bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage,(int)(bitmapOriginalImage.getWidth()*scale) ,(int)(bitmapOriginalImage.getHeight()*scale) ,true );
                 photoViewOriginalImage.setImageBitmap(bitmapOriginalImage);
+                photoViewContrastEnhnace.setImageBitmap(contrastEnhance(bitmapOriginalImage));
             }
         }
-        // bắt sự kiện bấm button hiện calendar
 
-        // Thread
-        saveImageThread = new Thread(new Runnable(){
-            public void run() {
-                String SaveAs = (String) getIntent().getSerializableExtra("Save As");
-                Form prevForm = (Form)getIntent().getSerializableExtra("oldform");
-                Form saveForm = new Form();
-                saveForm.setToday(textInputEditText_Today.getText().toString());
-                saveForm.setName(textInputEditText_PatientName.getText().toString());
-                saveForm.setDateOfBirth(textInputEditText_DateOfBirth.getText().toString());
-                saveForm.setPersonalID(textInputEditText_PersonalID.getText().toString());
-                saveForm.setBloodPressure_Systolic(textInputEditText_Systolic.getText().toString());
-                saveForm.setBloodPressure_Diastolic(textInputEditText_Diastolic.getText().toString());
-                saveForm.setBloodSugar(textInputEditText_BloodSugar.getText().toString());
-                saveForm.setHba1c(textInputEditText_Hba1c.getText().toString());
-                saveForm.setCholesterolLDL(textInputEditText_LDL.getText().toString());
-                saveForm.setCholesterolHDL(textInputEditText_HDL.getText().toString());
-                saveForm.setMedicalHistory(textInputEditText_MedicalHistory.getText().toString());
-                saveForm.setNote(textInputEditText_Note.getText().toString());
-                saveForm.setSex(spinner_sex.getSelectedItem().toString());
-                saveForm.setClassificationResult(spinner_result.getSelectedItem().toString());
+    }
 
-                // nếu không có sdcard -> không lưu ảnh
-                if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-                    // set giá trị null cho path
-                }
-                else{ // nếu có sdcard -> kiểm tra có thư mục hay không -> tạo thư mục -> nếu là thông tin mới -> lưu ảnh
-                    directory = new File(CONSTANTS.FOLDER_PATH_STORE_IMG);
-                    if (!directory.exists()) {
-                        directory.mkdirs();
-                    }
-                }
+    private void onTextChangeChecking(){
+        textInputEditText_Today.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                // nếu là edit bệnh nhân
-                if (SaveAs.equals("OLD")){
-                    boolean isUpdated = formDatabase.updateData(prevForm.getID(), saveForm);
-                }
-                // nếu là lưu mới thông tin bệnh nhân
-                else if (SaveAs.equals("NEW")){
-                    Bitmap bitmap = ((BitmapDrawable)photoViewOriginalImage.getDrawable()).getBitmap();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
-                    String saveImageName = sdf.format(new Date()) + ".jpg";
-                    File file = new File(directory ,saveImageName);
-                    try {
+            }
 
-                        OutputStream output = new FileOutputStream(file);
-                        long startTime = System.nanoTime();
-                        // Compress into png, jpg format image from 0% - 100%
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
-                        long endTime = System.nanoTime();
-                        Log.d("debug", "onOptionsItemSelected: inside thread Time (milisecond) to compress image is " + (endTime - startTime)/1000);
-
-                        output.flush();
-                        output.close();
-                    }
-                    catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-
-                    // lưu vào sqlite
-                    saveForm.setPathOriginalImage(CONSTANTS.FOLDER_PATH_STORE_IMG + File.separator + saveImageName);
-                    Log.d("debug", "onOptionsItemSelected: saveForm.getPathOriginalImage() == " + saveForm.getPathOriginalImage());
-                    Log.d("debug", "onOptionsItemSelected: saveForm.toString() == "+ saveForm.toString());
-                    long startTime = System.nanoTime();
-                    boolean isInserted = formDatabase.insertNewForm(saveForm);
-                    if (isInserted == true){
-                        // gửi tín hiệu cho MainActivity
-
-
-                    }
-                    long endTime = System.nanoTime();
-                    Log.d("debug", "onOptionsItemSelected: inside thread Time cost (milisecond) to inserted patient is " + (endTime - startTime)/1000);
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                SimpleDateFormat sdf = new SimpleDateFormat(CONSTANTS.DateFormat, Locale.getDefault());
+                textInputLayout_Today.setErrorEnabled(true);
+                textInputLayout_Today.setError("Error date format");
+                try {
+                    sdf.setLenient(false);
+                    Date today_parsed = sdf.parse(textInputEditText_Today.getText().toString());
+                    textInputLayout_Today.setErrorEnabled(false);
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
             }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
         });
+        textInputEditText_DateOfBirth.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                SimpleDateFormat sdf = new SimpleDateFormat(CONSTANTS.DateFormat, Locale.getDefault());
+                textInputLayout_DateOfBirth.setErrorEnabled(true);
+                textInputLayout_DateOfBirth.setError("Error date format");
+                try {
+                    sdf.setLenient(false);
+                    Date today_parsed = sdf.parse(textInputEditText_DateOfBirth.getText().toString());
+                    textInputLayout_DateOfBirth.setErrorEnabled(false);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        textInputEditText_Systolic.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textInputLayout_Systolic.setErrorEnabled(true);
+                textInputLayout_Systolic.setError("Value must be a number");
+                try {
+                    float value = Integer.parseInt(textInputEditText_Systolic.getText().toString());
+                    textInputLayout_Systolic.setErrorEnabled(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        textInputEditText_Diastolic.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textInputLayout_Diastolic.setErrorEnabled(true);
+                textInputLayout_Diastolic.setError("Value must be a number");
+                try {
+                    float value = Integer.parseInt(textInputEditText_Diastolic.getText().toString());
+                    textInputLayout_Diastolic.setErrorEnabled(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        textInputEditText_BloodSugar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textInputLayout_BloodSugar.setErrorEnabled(true);
+                textInputLayout_BloodSugar.setError("Value must be a number");
+                try {
+                    float value = Integer.parseInt(textInputEditText_BloodSugar.getText().toString());
+                    textInputLayout_BloodSugar.setErrorEnabled(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        textInputEditText_Hba1c.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textInputLayout_Hba1c.setErrorEnabled(true);
+                textInputLayout_Hba1c.setError("Value must be a number");
+                try {
+                    float value = Integer.parseInt(textInputEditText_Hba1c.getText().toString());
+                    textInputLayout_Hba1c.setErrorEnabled(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        textInputEditText_HDL.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textInputLayout_HDL.setErrorEnabled(true);
+                textInputLayout_HDL.setError("Value must be a number");
+                try {
+                    float value = Integer.parseInt(textInputEditText_HDL.getText().toString());
+                    textInputLayout_HDL.setErrorEnabled(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        textInputEditText_LDL.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textInputLayout_LDL.setErrorEnabled(true);
+                textInputLayout_LDL.setError("Value must be a number");
+                try {
+                    float value = Integer.parseInt(textInputEditText_LDL.getText().toString());
+                    textInputLayout_LDL.setErrorEnabled(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+    private Bitmap contrastEnhance(Bitmap bitmapsrc){
+        Mat image  = new Mat();
+        Mat matsrc = new Mat();
+        Mat matdest = new Mat();
+        Mat gaussianBlurSrc = new Mat();
+        Bitmap bpm32 = bitmapsrc.copy(Bitmap.Config.ARGB_8888,true);
+        Utils.bitmapToMat(bpm32,matsrc);
+        Imgproc.cvtColor(matsrc,image, Imgproc.COLOR_BGR2RGB);
+        org.opencv.core.Size s = new Size(0,0);
+        Imgproc.GaussianBlur(matsrc,gaussianBlurSrc,s,10);
+        Core.addWeighted(matsrc,4,gaussianBlurSrc,-4,128,matdest);
+        Bitmap bitmapdest = Bitmap.createBitmap(matdest.cols(),matdest.rows(),Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(matdest,bitmapdest);
+        return bitmapdest;
     }
 
     @Override
@@ -287,29 +429,39 @@ public class SaveActivity extends AppCompatActivity {
                 SaveActivity.super.onBackPressed();
                 return true;
             case R.id.menu_save:
-                // save data with multithread
-                //saveImageThread.start();
-                ProgressDialog mProgressDialog = ProgressDialog.show(this, "Please wait","Saving data", true);
-                new Thread() {
-                    @Override
-                    public void run() {
-                        WithoutMultiThread();
-                        try {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mProgressDialog.dismiss();
-                                    Toast.makeText(getApplicationContext(), "Infomation has been saved successfully", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // xóa các màn hình trước
-                                    startActivity(intent);
-                                }
-                            });
-                        } catch (final Exception ex) {
+                // check the input is validate value
+                if(textInputLayout_Today.isErrorEnabled() || textInputLayout_DateOfBirth.isErrorEnabled() || textInputLayout_Systolic.isErrorEnabled()
+                || textInputLayout_Diastolic.isErrorEnabled() || textInputLayout_BloodSugar.isErrorEnabled() || textInputLayout_Hba1c.isErrorEnabled()
+                || textInputLayout_LDL.isErrorEnabled() || textInputLayout_HDL.isErrorEnabled())
+                {
+                    Toast.makeText(getApplicationContext(),"Some input is incorrect", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    // save data with multithread
+                    //saveImageThread.start();
+                    ProgressDialog mProgressDialog = ProgressDialog.show(this, "Please wait","Saving data", true);
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            WithoutMultiThread();
+                            try {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mProgressDialog.dismiss();
+                                        Toast.makeText(getApplicationContext(), "Infomation has been saved successfully", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // xóa các màn hình trước
+                                        startActivity(intent);
+                                    }
+                                });
+                            } catch (final Exception ex) {
 
+                            }
                         }
-                    }
-                }.start();
+                    }.start();
+                }
+
                 break;
             default:break;
         }

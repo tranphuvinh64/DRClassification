@@ -63,4 +63,6 @@ public final class CONSTANTS {
     public static final int MAX_HEIGHT = 4500;
     public static final int MAX_WIDTH = 6300;
 
+    public static final String DateFormat = "dd/MM/yyyy";
+
 }

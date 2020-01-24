@@ -1,5 +1,5 @@
-level0
-level1
-level2
-level3
-level4
+No DR
+Mild
+Moderate
+Severe
+Proliferative

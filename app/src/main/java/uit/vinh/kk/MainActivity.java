@@ -485,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String dateView (String studyDate){
         // xử lý hiển thị ngày tháng
         Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(CONSTANTS.DateFormat, Locale.getDefault());
         String currentDate = sdf.format(new Date());
         try {
             Date today_parsed = sdf.parse(currentDate);
