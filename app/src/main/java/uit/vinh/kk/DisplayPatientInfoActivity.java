@@ -106,10 +106,7 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         textInputLayout_MedicalHistory = findViewById(R.id.info_textinputlayout_MedicalHistory);
         textInputLayout_Note = findViewById(R.id.info_textinputlayout_MedicalHistory);
 
-        spinner_sex = findViewById(R.id.info_spinner_sex);
         spinner_result = findViewById(R.id.info_spinner_result);
-
-
 
         photoViewOriginalImage = findViewById(R.id.info_photoview_OriginalImage);
         photoViewContrastEnhnace = findViewById(R.id.info_photoview_ContrastEnhance);

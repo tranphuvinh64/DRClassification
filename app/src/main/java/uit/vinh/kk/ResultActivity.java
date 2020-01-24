@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -36,9 +37,9 @@ import java.util.List;
 
 public class ResultActivity extends AppCompatActivity implements View.OnClickListener {
     ProgressDialog dialogLoadActivity = null;
-    float scale =  1;
-    Bitmap bitmapOriginalImage =null;
-    Bitmap bitmapContrastEnhance = null;
+    float scale = 1;
+    static Bitmap bitmapOriginalImage = null;
+    static Bitmap bitmapContrastEnhance = null;
     private String imagePath;
     // presets for rgb conversion
     private static final int RESULTS_TO_SHOW = 3;
@@ -68,14 +69,16 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     private Bitmap rgbFrameBitmap = null;
     private Classifier classifier;
     private Integer sensorOrientation = 0;
+
     static {
-        if(!OpenCVLoader.initDebug())
+        if (!OpenCVLoader.initDebug())
             Log.d("...", "OpenCv load fail!");
         else
             Log.d("...", "OpenCv success.");
     }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // initialize array that holds image data
         intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
@@ -84,7 +87,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         photoView = findViewById(R.id.photoview);
         buttonSave = findViewById(R.id.buttonSaveData);
         buttonSave.setOnClickListener(this);
-        rgbFrameBitmap = Bitmap.createBitmap(640,480,Bitmap.Config.ARGB_8888);
+        rgbFrameBitmap = Bitmap.createBitmap(640, 480, Bitmap.Config.ARGB_8888);
         try {
             classifier = new Classifier(this);
         } catch (IOException e) {
@@ -107,26 +110,26 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         recognition4TextView.setText("Level 4");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        imagePath = (String)getIntent().getSerializableExtra("ImagePath");
+        imagePath = (String) getIntent().getSerializableExtra("ImagePath");
 
 
-        dialogLoadActivity = ProgressDialog.show(this, "Please wait","Processing...", true);
+        dialogLoadActivity = ProgressDialog.show(this, "Please wait", "Processing...", true);
         new Thread() {
             @Override
             public void run() {
                 try {
-                    bitmapOriginalImage = MediaStore.Images.Media.getBitmap(getContentResolver(),Uri.parse("file://"+imagePath));
-                    if(bitmapOriginalImage!=null){
-                        if (bitmapOriginalImage.getHeight()>CONSTANTS.MAX_HEIGHT || bitmapOriginalImage.getWidth()>CONSTANTS.MAX_WIDTH){
+                    bitmapOriginalImage = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file://" + imagePath));
+                    if (bitmapOriginalImage != null) {
+                        if (bitmapOriginalImage.getHeight() > CONSTANTS.MAX_HEIGHT || bitmapOriginalImage.getWidth() > CONSTANTS.MAX_WIDTH) {
                             Log.d("debug", "onCreate: original size " + bitmapOriginalImage.getWidth() + "---" + bitmapOriginalImage.getHeight());
                             scale = (float) 1.0;
-                            for (float i = 0; i <= 1 ; i = i + (float)0.05){
-                                if(bitmapOriginalImage.getWidth()*i<=CONSTANTS.MAX_WIDTH && bitmapOriginalImage.getHeight()*i<=CONSTANTS.MAX_HEIGHT){
+                            for (float i = 0; i <= 1; i = i + (float) 0.05) {
+                                if (bitmapOriginalImage.getWidth() * i <= CONSTANTS.MAX_WIDTH && bitmapOriginalImage.getHeight() * i <= CONSTANTS.MAX_HEIGHT) {
                                     scale = i;
                                 }
                             }
                             Log.d("debug", "onCreate: selected scale == " + scale);
-                            bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage,(int)(bitmapOriginalImage.getWidth()*scale) ,(int)(bitmapOriginalImage.getHeight()*scale) ,true );
+                            bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage, (int) (bitmapOriginalImage.getWidth() * scale), (int) (bitmapOriginalImage.getHeight() * scale), true);
 
                             Log.d("debug", "run: bitmap contrast enhance is " + bitmapContrastEnhance);
                         }
@@ -147,7 +150,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                         public void run() {
                             photoView.setImageBitmap(bitmapOriginalImage);
                             Classify();
-                           dialogLoadActivity.dismiss();
+                            dialogLoadActivity.dismiss();
                         }
                     });
                 } catch (final Exception ex) {
@@ -166,80 +169,54 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 ResultActivity.super.onBackPressed();
                 return true;
             case R.id.contrastenhance:
-                if(bitmapOriginalImage != null){
+                if (bitmapOriginalImage != null) {
                     photoView.setImageBitmap(bitmapContrastEnhance);
                 }
 
                 break;
             case R.id.originalimage:
-                if(bitmapOriginalImage != null){
+                if (bitmapOriginalImage != null) {
                     photoView.setImageBitmap(bitmapOriginalImage);
                 }
                 //photoView.setImageURI(uri);
                 break;
-            default:break;
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private Bitmap contrastEnhance(Bitmap bitmapsrc){
-        Mat image  = new Mat();
+    private Bitmap contrastEnhance(Bitmap bitmapsrc) {
+        Mat image = new Mat();
         Mat matsrc = new Mat();
         Mat matdest = new Mat();
         Mat gaussianBlurSrc = new Mat();
-        Bitmap bpm32 = bitmapsrc.copy(Bitmap.Config.ARGB_8888,true);
-        Utils.bitmapToMat(bpm32,matsrc);
-        Imgproc.cvtColor(matsrc,image, Imgproc.COLOR_BGR2RGB);
-        org.opencv.core.Size s = new Size(0,0);
-        Imgproc.GaussianBlur(matsrc,gaussianBlurSrc,s,10);
-        Core.addWeighted(matsrc,4,gaussianBlurSrc,-4,128,matdest);
-        Bitmap bitmapdest = Bitmap.createBitmap(matdest.cols(),matdest.rows(),Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(matdest,bitmapdest);
+        Bitmap bpm32 = bitmapsrc.copy(Bitmap.Config.ARGB_8888, true);
+        Utils.bitmapToMat(bpm32, matsrc);
+        Imgproc.cvtColor(matsrc, image, Imgproc.COLOR_BGR2RGB);
+        org.opencv.core.Size s = new Size(0, 0);
+        Imgproc.GaussianBlur(matsrc, gaussianBlurSrc, s, 10);
+        Core.addWeighted(matsrc, 4, gaussianBlurSrc, -4, 128, matdest);
+        Bitmap bitmapdest = Bitmap.createBitmap(matdest.cols(), matdest.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(matdest, bitmapdest);
         return bitmapdest;
     }
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.buttonSaveData){
+        if (v.getId() == R.id.buttonSaveData) {
+            Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
+            String temp = (String) getIntent().getSerializableExtra("ImagePath");
 
-            dialogLoadActivity = ProgressDialog.show(this, "Please wait","Preparing data...", true);
-            new Thread() {
-                @Override
-                public void run() {
-                    Intent intent = new Intent(getApplicationContext(), SaveActivity.class);
-                    String temp = (String)getIntent().getSerializableExtra("ImagePath");
-                    intent.putExtra("ImagePath", temp);
-                    intent.putExtra("scalevalue", scale);
-                    intent.putExtra("Save As", CONSTANTS.SAVE_AS_MODE_NEW);
-                    startActivity(intent);
-                    try {
-                        Thread.sleep(1300);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-
-                        // code runs in a thread
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-//                                dialogLoadActivity.dismiss();
-//                                startActivity(intent);
-                                dialogLoadActivity.dismiss();
-                            }
-                        });
-                    } catch (final Exception ex) {
-
-                    }
-                }
-            }.start();
-
+            intent.putExtra("ImagePath", temp);
+            intent.putExtra("scalevalue", scale);
+            intent.putExtra("Save As", CONSTANTS.SAVE_AS_MODE_NEW);
+            startActivity(intent);
 
         }
     }
@@ -258,22 +235,22 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                 final int val = intValues[pixel++];
                 // get rgb values from intValues where each int holds the rgb values for a pixel.
                 // if quantized, convert each rgb value to a byte, otherwise to a float
-                if(quant){
+                if (quant) {
                     imgData.put((byte) ((val >> 16) & 0xFF));
                     imgData.put((byte) ((val >> 8) & 0xFF));
                     imgData.put((byte) (val & 0xFF));
                 } else {
-                    imgData.putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
-                    imgData.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
-                    imgData.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+                    imgData.putFloat((((val >> 16) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
+                    imgData.putFloat((((val >> 8) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
+                    imgData.putFloat((((val) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
                 }
             }
         }
     }
 
-    private void Classify(){
+    private void Classify() {
         // get current bitmap from photoView
-        Bitmap bitmap_orig = ((BitmapDrawable)photoView.getDrawable()).getBitmap();
+        Bitmap bitmap_orig = ((BitmapDrawable) photoView.getDrawable()).getBitmap();
 
         // trường hợp nếu photoView không có ảnh: -> 5 giá trị xác suất đều là 0%
 
@@ -289,7 +266,8 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         if (results != null && results.size() >= 5) {
             Classifier.Recognition recognition = results.get(0);
             if (recognition != null) {
-                if (recognition.getTitle() != null) recognitionTextView.setText(recognition.getTitle());
+                if (recognition.getTitle() != null)
+                    recognitionTextView.setText(recognition.getTitle());
                 if (recognition.getConfidence() != null)
                     recognitionValueTextView.setText(
                             String.format("%.2f", (100 * recognition.getConfidence())) + "%");
@@ -297,7 +275,8 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
             Classifier.Recognition recognition1 = results.get(1);
             if (recognition1 != null) {
-                if (recognition1.getTitle() != null) recognition1TextView.setText(recognition1.getTitle());
+                if (recognition1.getTitle() != null)
+                    recognition1TextView.setText(recognition1.getTitle());
                 if (recognition1.getConfidence() != null)
                     recognition1ValueTextView.setText(
                             String.format("%.2f", (100 * recognition1.getConfidence())) + "%");
@@ -305,7 +284,8 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
             Classifier.Recognition recognition2 = results.get(2);
             if (recognition2 != null) {
-                if (recognition2.getTitle() != null) recognition2TextView.setText(recognition2.getTitle());
+                if (recognition2.getTitle() != null)
+                    recognition2TextView.setText(recognition2.getTitle());
                 if (recognition2.getConfidence() != null)
                     recognition2ValueTextView.setText(
                             String.format("%.2f", (100 * recognition2.getConfidence())) + "%");
@@ -313,7 +293,8 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
             Classifier.Recognition recognition3 = results.get(3);
             if (recognition3 != null) {
-                if (recognition3.getTitle() != null) recognition3TextView.setText(recognition3.getTitle());
+                if (recognition3.getTitle() != null)
+                    recognition3TextView.setText(recognition3.getTitle());
                 if (recognition3.getConfidence() != null)
                     recognition3ValueTextView.setText(
                             String.format("%.2f", (100 * recognition3.getConfidence())) + "%");
@@ -321,7 +302,8 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
             Classifier.Recognition recognition4 = results.get(4);
             if (recognition4 != null) {
-                if (recognition4.getTitle() != null) recognition4TextView.setText(recognition4.getTitle());
+                if (recognition4.getTitle() != null)
+                    recognition4TextView.setText(recognition4.getTitle());
                 if (recognition4.getConfidence() != null)
                     recognition4ValueTextView.setText(
                             String.format("%.2f", (100 * recognition4.getConfidence())) + "%");

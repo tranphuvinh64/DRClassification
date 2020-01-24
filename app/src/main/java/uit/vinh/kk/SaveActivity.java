@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -47,8 +48,10 @@ import java.util.Locale;
 
 public class SaveActivity extends AppCompatActivity {
     Runnable saveImageRunnable;
-    DatabaseHelper formDatabase ;
+    DatabaseHelper formDatabase;
 
+    static Bitmap bitmapOriginalImage =null;
+    static Bitmap bitmapContrastEnhance = null;
 
     private TextInputLayout textInputLayout_Today;
     private TextInputLayout textInputLayout_PatientName;
@@ -79,7 +82,8 @@ public class SaveActivity extends AppCompatActivity {
     private Button button_calendarToday;
     private Button button_calendarDOB;
 
-    private Spinner spinner_sex;
+    private RadioButton rbt_male;
+    private RadioButton rbt_female;
     private Spinner spinner_result;
 
     private PhotoView photoViewOriginalImage;
@@ -87,12 +91,16 @@ public class SaveActivity extends AppCompatActivity {
     private ImageView imageViewOriginalImage;
     private File directory;
     private Thread saveImageThread;
-    public Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.patientinfo);
+
+        // Get Bitmap from result activity
+        bitmapOriginalImage = ResultActivity.bitmapOriginalImage;
+        bitmapContrastEnhance = ResultActivity.bitmapContrastEnhance;
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // create components
@@ -109,7 +117,6 @@ public class SaveActivity extends AppCompatActivity {
         textInputEditText_MedicalHistory = findViewById(R.id.info_textinputedittext_MedicalHistory);
         textInputEditText_Note = findViewById(R.id.info_textinputedittext_Note);
 
-
         textInputLayout_Today = findViewById(R.id.info_textinputlayout_Today);
         textInputLayout_PatientName = findViewById(R.id.info_textinputlayout_PatientName);
         textInputLayout_DateOfBirth = findViewById(R.id.info_textinputlayout_DateOfBirth);
@@ -118,7 +125,7 @@ public class SaveActivity extends AppCompatActivity {
         textInputLayout_Diastolic = findViewById(R.id.info_textinputlayout_Diastolic);
         textInputLayout_BloodSugar = findViewById(R.id.info_textinputlayout_BloodSugar);
         textInputLayout_Hba1c = findViewById(R.id.info_textinputlayout_Hba1c);
-        textInputLayout_HDL = findViewById( R.id.info_textinputlayout_HDL);
+        textInputLayout_HDL = findViewById(R.id.info_textinputlayout_HDL);
         textInputLayout_LDL = findViewById(R.id.info_textinputlayout_LDL);
         textInputLayout_MedicalHistory = findViewById(R.id.info_textinputlayout_MedicalHistory);
         textInputLayout_Note = findViewById(R.id.info_textinputlayout_MedicalHistory);
@@ -162,20 +169,20 @@ public class SaveActivity extends AppCompatActivity {
                     myCalendar.get(Calendar.DAY_OF_MONTH)).show();
         });
 
-        spinner_sex = findViewById(R.id.info_spinner_sex);
+        rbt_male = findViewById(R.id.rbt_male);
+        rbt_female = findViewById(R.id.rbt_female);
         spinner_result = findViewById(R.id.info_spinner_result);
-
 
         photoViewOriginalImage = findViewById(R.id.info_photoview_OriginalImage);
         photoViewContrastEnhnace = findViewById(R.id.info_photoview_ContrastEnhance);
 
 
-        formDatabase = new DatabaseHelper(this);
+        formDatabase = new DatabaseHelper(getApplicationContext());
         String SaveAs = (String) getIntent().getSerializableExtra("Save As");
-        if (SaveAs.equals(CONSTANTS.SAVE_AS_MODE_EDIT)){
+        if (SaveAs.equals(CONSTANTS.SAVE_AS_MODE_EDIT)) {
             photoViewContrastEnhnace.setVisibility(View.GONE);
             photoViewOriginalImage.setVisibility(View.GONE);
-            Form oldForm = (Form)getIntent().getSerializableExtra("oldform");
+            Form oldForm = (Form) getIntent().getSerializableExtra("oldform");
             textInputEditText_Today.setText(oldForm.getToday());
             textInputEditText_PatientName.setText(oldForm.getName());
             textInputEditText_DateOfBirth.setText(oldForm.getDateOfBirth());
@@ -189,33 +196,26 @@ public class SaveActivity extends AppCompatActivity {
             textInputEditText_MedicalHistory.setText(oldForm.getMedicalHistory());
             textInputEditText_Note.setText(oldForm.getNote());
 
-            spinner_result.setSelection(((ArrayAdapter)spinner_result.getAdapter()).getPosition(oldForm.getClassificationResult()));
-            spinner_sex.setSelection(((ArrayAdapter)spinner_sex.getAdapter()).getPosition(oldForm.getSex()));
+            spinner_result.setSelection(((ArrayAdapter) spinner_result.getAdapter()).getPosition(oldForm.getClassificationResult()));
 
-        }
-        else if (SaveAs.equals(CONSTANTS.SAVE_AS_MODE_NEW)){
+        } else if (SaveAs.equals(CONSTANTS.SAVE_AS_MODE_NEW)) {
             SimpleDateFormat sdfToday = new SimpleDateFormat(CONSTANTS.DateFormat, Locale.getDefault());
             textInputEditText_Today.setText(sdfToday.format(new Date()));
             Log.d("debug", "onCreate: Save as Mode new");
             //Uri URIOriginalImage = (Uri) getIntent().getParcelableExtra("URIOriginalImage");
-            String originalImagePath = (String)getIntent().getSerializableExtra("ImagePath");
+            String originalImagePath = (String) getIntent().getSerializableExtra("ImagePath");
             float scale = (float) getIntent().getSerializableExtra("scalevalue");
-            Bitmap bitmapOriginalImage = null;
-            try {
-                bitmapOriginalImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(),Uri.parse("file://"+ originalImagePath));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if(bitmapOriginalImage!=null ){
-                bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage,(int)(bitmapOriginalImage.getWidth()*scale) ,(int)(bitmapOriginalImage.getHeight()*scale) ,true );
+
+            Handler handler = new Handler();
+            handler.post(() -> {
                 photoViewOriginalImage.setImageBitmap(bitmapOriginalImage);
-                photoViewContrastEnhnace.setImageBitmap(contrastEnhance(bitmapOriginalImage));
-            }
+                photoViewContrastEnhnace.setImageBitmap(bitmapContrastEnhance);
+            });
         }
 
     }
 
-    private void onTextChangeChecking(){
+    private void onTextChangeChecking() {
         textInputEditText_Today.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -405,41 +405,39 @@ public class SaveActivity extends AppCompatActivity {
             }
         });
     }
-    private Bitmap contrastEnhance(Bitmap bitmapsrc){
-        Mat image  = new Mat();
+
+    private Bitmap contrastEnhance(Bitmap bitmapsrc) {
+        Mat image = new Mat();
         Mat matsrc = new Mat();
         Mat matdest = new Mat();
         Mat gaussianBlurSrc = new Mat();
-        Bitmap bpm32 = bitmapsrc.copy(Bitmap.Config.ARGB_8888,true);
-        Utils.bitmapToMat(bpm32,matsrc);
-        Imgproc.cvtColor(matsrc,image, Imgproc.COLOR_BGR2RGB);
-        org.opencv.core.Size s = new Size(0,0);
-        Imgproc.GaussianBlur(matsrc,gaussianBlurSrc,s,10);
-        Core.addWeighted(matsrc,4,gaussianBlurSrc,-4,128,matdest);
-        Bitmap bitmapdest = Bitmap.createBitmap(matdest.cols(),matdest.rows(),Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(matdest,bitmapdest);
+        Bitmap bpm32 = bitmapsrc.copy(Bitmap.Config.ARGB_8888, true);
+        Utils.bitmapToMat(bpm32, matsrc);
+        Imgproc.cvtColor(matsrc, image, Imgproc.COLOR_BGR2RGB);
+        org.opencv.core.Size s = new Size(0, 0);
+        Imgproc.GaussianBlur(matsrc, gaussianBlurSrc, s, 10);
+        Core.addWeighted(matsrc, 4, gaussianBlurSrc, -4, 128, matdest);
+        Bitmap bitmapdest = Bitmap.createBitmap(matdest.cols(), matdest.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(matdest, bitmapdest);
         return bitmapdest;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 SaveActivity.super.onBackPressed();
                 return true;
             case R.id.menu_save:
                 // check the input is validate value
-                if(textInputLayout_Today.isErrorEnabled() || textInputLayout_DateOfBirth.isErrorEnabled() || textInputLayout_Systolic.isErrorEnabled()
-                || textInputLayout_Diastolic.isErrorEnabled() || textInputLayout_BloodSugar.isErrorEnabled() || textInputLayout_Hba1c.isErrorEnabled()
-                || textInputLayout_LDL.isErrorEnabled() || textInputLayout_HDL.isErrorEnabled())
-                {
-                    Toast.makeText(getApplicationContext(),"Some input is incorrect", Toast.LENGTH_SHORT).show();
-                }
-                else{
+                if (textInputLayout_Today.isErrorEnabled() || textInputLayout_DateOfBirth.isErrorEnabled() || textInputLayout_Systolic.isErrorEnabled()
+                        || textInputLayout_Diastolic.isErrorEnabled() || textInputLayout_BloodSugar.isErrorEnabled() || textInputLayout_Hba1c.isErrorEnabled()
+                        || textInputLayout_LDL.isErrorEnabled() || textInputLayout_HDL.isErrorEnabled()) {
+                    Toast.makeText(getApplicationContext(), "Some input is incorrect", Toast.LENGTH_SHORT).show();
+                } else {
                     // save data with multithread
                     //saveImageThread.start();
-                    ProgressDialog mProgressDialog = ProgressDialog.show(this, "Please wait","Saving data", true);
+                    ProgressDialog mProgressDialog = ProgressDialog.show(this, "Please wait", "Saving data", true);
                     new Thread() {
                         @Override
                         public void run() {
@@ -463,14 +461,15 @@ public class SaveActivity extends AppCompatActivity {
                 }
 
                 break;
-            default:break;
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void WithoutMultiThread(){
+    private void WithoutMultiThread() {
         String SaveAs = (String) getIntent().getSerializableExtra("Save As");
-        Form prevForm = (Form)getIntent().getSerializableExtra("oldform");
+        Form prevForm = (Form) getIntent().getSerializableExtra("oldform");
         Form saveForm = new Form();
         saveForm.setToday(textInputEditText_Today.getText().toString());
         saveForm.setName(textInputEditText_PatientName.getText().toString());
@@ -484,14 +483,18 @@ public class SaveActivity extends AppCompatActivity {
         saveForm.setCholesterolHDL(textInputEditText_HDL.getText().toString());
         saveForm.setMedicalHistory(textInputEditText_MedicalHistory.getText().toString());
         saveForm.setNote(textInputEditText_Note.getText().toString());
-        saveForm.setSex(spinner_sex.getSelectedItem().toString());
+
+        if(rbt_male.isChecked())
+            saveForm.setSex(rbt_male.getText().toString());
+        else
+            saveForm.setSex(rbt_female.getText().toString());
+
         saveForm.setClassificationResult(spinner_result.getSelectedItem().toString());
 
         // nếu không có sdcard -> không lưu ảnh
-        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             // set giá trị null cho path
-        }
-        else{ // nếu có sdcard -> kiểm tra có thư mục hay không -> tạo thư mục -> nếu là thông tin mới -> lưu ảnh
+        } else { // nếu có sdcard -> kiểm tra có thư mục hay không -> tạo thư mục -> nếu là thông tin mới -> lưu ảnh
             directory = new File(CONSTANTS.FOLDER_PATH_STORE_IMG);
             if (!directory.exists()) {
                 directory.mkdirs();
@@ -499,15 +502,15 @@ public class SaveActivity extends AppCompatActivity {
         }
 
         // nếu là edit bệnh nhân
-        if (SaveAs.equals("OLD")){
+        if (SaveAs.equals("OLD")) {
             boolean isUpdated = formDatabase.updateData(prevForm.getID(), saveForm);
         }
         // nếu là lưu mới thông tin bệnh nhân
-        else if (SaveAs.equals("NEW")){
-            Bitmap bitmap = ((BitmapDrawable)photoViewOriginalImage.getDrawable()).getBitmap();
+        else if (SaveAs.equals("NEW")) {
+            Bitmap bitmap = ((BitmapDrawable) photoViewOriginalImage.getDrawable()).getBitmap();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
             String saveImageName = sdf.format(new Date()) + ".jpg";
-            File file = new File(directory ,saveImageName);
+            File file = new File(directory, saveImageName);
             try {
 
                 OutputStream output = new FileOutputStream(file);
@@ -517,8 +520,7 @@ public class SaveActivity extends AppCompatActivity {
                 long endTime = System.nanoTime();
                 output.flush();
                 output.close();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -527,13 +529,14 @@ public class SaveActivity extends AppCompatActivity {
             saveForm.setPathOriginalImage(CONSTANTS.FOLDER_PATH_STORE_IMG + File.separator + saveImageName);
             long startTime = System.nanoTime();
             boolean isInserted = formDatabase.insertNewForm(saveForm);
-            if (isInserted == true){
+            if (isInserted == true) {
                 // gửi tín hiệu cho MainActivity
 
             }
         }
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_actionbar_save, menu);

@@ -1,314 +1,369 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     style="@style/AppTheme"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/info_textinputlayout_Today"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Study Date"
-            app:endIconMode="custom"
-            app:endIconDrawable="@drawable/ic_calendar">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/info_textinputedittext_Today"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/info_textinputlayout_PatientName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Full Name">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/info_textinputedittext_PatientName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/info_textinputlayout_PersonalID"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Personal ID">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/info_textinputedittext_PersonalID"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-        <Spinner
-            android:id="@+id/info_spinner_sex"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/spinner_sex_type"/>
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="20dp"/>
-
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/info_textinputlayout_DateOfBirth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Date of Birth (dd/mm/yyyy)"
-            app:endIconMode="custom"
-            android:focusable="false"
-            app:endIconDrawable="@drawable/ic_calendar">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/info_textinputedittext_DateOfBirth"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.github.chrisbanes.photoview.PhotoView
-            android:id="@+id/info_photoview_OriginalImage"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="@color/blackBackground"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="30dp"/>
-        <com.github.chrisbanes.photoview.PhotoView
-            android:id="@+id/info_photoview_ContrastEnhance"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="@color/blackBackground"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <TextView
-                android:layout_width="wrap_content"
+                style="@style/TextView.SaveLabel"
+                android:text="Patien Info" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/info_textinputlayout_Today"
+                style="@style/TextInputLayout"
+                android:hint="Study Date"
+                app:endIconDrawable="@drawable/ic_calendar"
+                app:endIconMode="custom">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/info_textinputedittext_Today"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/info_textinputlayout_PatientName"
+                style="@style/TextInputLayout"
+                android:hint="Full Name">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/info_textinputedittext_PatientName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/info_textinputlayout_PersonalID"
+                style="@style/TextInputLayout"
+                android:hint="Personal ID">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/info_textinputedittext_PersonalID"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <RadioGroup
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Diagnosis"/>
-            <Spinner
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/info_spinner_result"
-                android:entries="@array/spinner_classification_result"/>
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/rbt_male"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Male" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/rbt_female"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Female" />
+            </RadioGroup>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/info_textinputlayout_DateOfBirth"
+                style="@style/TextInputLayout"
+                android:focusable="false"
+                android:hint="Date of Birth (dd/mm/yyyy)"
+                app:endIconDrawable="@drawable/ic_calendar"
+                app:endIconMode="custom">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/info_textinputedittext_DateOfBirth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="20dp" />
-
+        <!--        <Spinner-->
+        <!--            android:id="@+id/info_spinner_sex"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:entries="@array/spinner_sex_type" />-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Blood Pressure"/>
-            <LinearLayout
+                style="@style/TextView.SaveLabel"
+                android:paddingBottom="10dp"
+                android:text="Patien Info" />
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:id="@+id/info_textinputlayout_Systolic"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Systolic"
-                    app:suffixText="mmHg"
-                    android:layout_weight="1">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/info_textinputedittext_Systolic"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-                </com.google.android.material.textfield.TextInputLayout>
+                app:cardCornerRadius="5dp">
 
-                <LinearLayout
-                    android:layout_width="30dp"
-                    android:layout_height="0dp"/>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:id="@+id/info_textinputlayout_Diastolic"
+                <com.github.chrisbanes.photoview.PhotoView
+                    android:id="@+id/info_photoview_OriginalImage"
                     android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@color/blackBackground" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="5dp">
+
+                <com.github.chrisbanes.photoview.PhotoView
+                    android:id="@+id/info_photoview_ContrastEnhance"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@color/blackBackground" />
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextView.SaveLabel"
+                android:paddingBottom="10dp"
+                android:text="Diagnosis" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <Spinner
+                    style="@style/Widget.AppCompat.Spinner"
+                    android:id="@+id/info_spinner_result"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="Diastolic"
-                    app:suffixText="mmHg"
-                    android:layout_weight="1">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/info_textinputedittext_Diastolic"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-                </com.google.android.material.textfield.TextInputLayout>
+                    android:entries="@array/spinner_classification_result" />
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2">
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:id="@+id/info_textinputlayout_BloodSugar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Blood Sugar"
-                app:suffixText="mg/dL"
-                android:layout_weight="1">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/info_textinputedittext_BloodSugar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Blood Sugar"
-                app:suffixText="mg/dL"
-                android:layout_weight="1"
-                android:visibility="invisible">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:id="@+id/info_textinputlayout_Hba1c"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Hba1c"
-                app:suffixText="%"
-                android:layout_weight="1">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/info_textinputedittext_Hba1c"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Hba1c"
-                app:suffixText="%"
-                android:layout_weight="1"
-                android:visibility="invisible">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cholesterol"/>
+                style="@style/TextView.SaveLabel"
+                android:paddingBottom="10dp"
+                android:text="Blood Pressure" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:id="@+id/info_textinputlayout_HDL"
-                    android:layout_width="200dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="HDL"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/info_textinputlayout_Systolic"
+                        style="@style/TextInputLayout"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:hint="Systolic"
+                        app:suffixText="mmHg">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/info_textinputedittext_Systolic"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/info_textinputlayout_Diastolic"
+                        style="@style/TextInputLayout"
+                        android:layout_width="0dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_weight="1"
+                        android:hint="Diastolic"
+                        app:suffixText="mmHg">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/info_textinputedittext_Diastolic"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/info_textinputlayout_BloodSugar"
+                    style="@style/TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_weight="1"
+                    android:hint="Blood Sugar"
                     app:suffixText="mg/dL">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/info_textinputedittext_HDL"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"/>
-                </com.google.android.material.textfield.TextInputLayout>
 
-                <LinearLayout
-                    android:layout_width="20dp"
-                    android:layout_height="0dp"/>
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:id="@+id/info_textinputlayout_LDL"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="LDL"
-                    app:suffixText="mg/dL"
-                    android:layout_weight="1">
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/info_textinputedittext_LDL"
+                        android:id="@+id/info_textinputedittext_BloodSugar"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"/>
+                        android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
-        </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Medical History"/>
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:id="@+id/info_textinputlayout_MedicalHistory"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="100dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/info_textinputedittext_MedicalHistory"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:gravity="top"/>
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Note"/>
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:id="@+id/info_textinputlayout_Note"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/info_textinputlayout_Hba1c"
+                    style="@style/TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_weight="1"
+                    android:hint="Hba1c"
+                    app:suffixText="%">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/info_textinputedittext_Hba1c"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="100dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/info_textinputedittext_Note"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextView.SaveLabel"
+                    android:paddingBottom="10dp"
+                    android:text="Cholesterol" />
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:gravity="top"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/info_textinputlayout_HDL"
+                        style="@style/TextInputLayout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="HDL"
+                        app:suffixText="mg/dL">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/info_textinputedittext_HDL"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/info_textinputlayout_LDL"
+                        style="@style/TextInputLayout"
+                        android:layout_width="0dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_weight="1"
+                        android:hint="LDL"
+                        app:suffixText="mg/dL">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/info_textinputedittext_LDL"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextView.SaveLabel"
+                    android:paddingBottom="10dp"
+                    android:text="Medical History" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/info_textinputlayout_MedicalHistory"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/info_textinputedittext_MedicalHistory"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top"
+                        android:lines="5" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextView.SaveLabel"
+                    android:paddingBottom="10dp"
+                    android:text="Note" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/info_textinputlayout_Note"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/info_textinputedittext_Note"
+                        android:layout_width="match_parent"
+                        android:lines="5"
+                        android:layout_height="wrap_content"
+                        android:gravity="top" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
 </ScrollView>
