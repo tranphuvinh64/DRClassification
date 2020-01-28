@@ -137,7 +137,7 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
 
 
         spinner_result.setEnabled(false);
-        spinner_sex.setEnabled(false);
+        //spinner_sex.setEnabled(false);
 
         //edittext_idForm.setText(prevForm.getID());
         textInputEditText_PatientName.setText(prevForm.getName());
@@ -155,7 +155,7 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
 
 
         spinner_result.setSelection(((ArrayAdapter)spinner_result.getAdapter()).getPosition(prevForm.getClassificationResult()));
-        spinner_sex.setSelection(((ArrayAdapter)spinner_sex.getAdapter()).getPosition(prevForm.getSex()));
+        //spinner_sex.setSelection(((ArrayAdapter)spinner_sex.getAdapter()).getPosition(prevForm.getSex()));
 
         Log.d("debug", "onCreate: image Path  == " + prevForm.getPathOriginalImage());
         Bitmap bitmapOriginalImage = null;

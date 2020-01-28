@@ -34,7 +34,7 @@ public final class CONSTANTS {
     public static final String SAVE_AS_MODE_NEW = "NEW";
 
     // constants for MainActivity
-    public static final int MAX_LENGTH_THIRD_STRING = 43;
+    public static final int MAX_LENGTH_THIRD_STRING = 35;
     public static final int MAX_LENGTH_FIRST_STRING = 35;
     public static final int COLUMN_ID_INDEX = 0;
     public static final int COLUMN_TODAY_INDEX = 1;

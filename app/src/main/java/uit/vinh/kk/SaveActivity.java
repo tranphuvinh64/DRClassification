@@ -274,6 +274,10 @@ public class SaveActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (textInputEditText_Systolic.getText().toString().equals("") == true){
+                    textInputLayout_Systolic.setErrorEnabled(false);
+                    return;
+                }
                 textInputLayout_Systolic.setErrorEnabled(true);
                 textInputLayout_Systolic.setError("Value must be a number");
                 try {
@@ -297,6 +301,10 @@ public class SaveActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (textInputEditText_Diastolic.getText().toString().equals("") == true){
+                    textInputLayout_Diastolic.setErrorEnabled(false);
+                    return;
+                }
                 textInputLayout_Diastolic.setErrorEnabled(true);
                 textInputLayout_Diastolic.setError("Value must be a number");
                 try {
@@ -320,6 +328,10 @@ public class SaveActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (textInputEditText_BloodSugar.getText().toString().equals("") == true){
+                    textInputLayout_BloodSugar.setErrorEnabled(false);
+                    return;
+                }
                 textInputLayout_BloodSugar.setErrorEnabled(true);
                 textInputLayout_BloodSugar.setError("Value must be a number");
                 try {
@@ -343,6 +355,10 @@ public class SaveActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (textInputEditText_Hba1c.getText().toString().equals("") == true){
+                    textInputLayout_Hba1c.setErrorEnabled(false);
+                    return;
+                }
                 textInputLayout_Hba1c.setErrorEnabled(true);
                 textInputLayout_Hba1c.setError("Value must be a number");
                 try {
@@ -366,6 +382,10 @@ public class SaveActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (textInputEditText_HDL.getText().toString().equals("") == true){
+                    textInputLayout_HDL.setErrorEnabled(false);
+                    return;
+                }
                 textInputLayout_HDL.setErrorEnabled(true);
                 textInputLayout_HDL.setError("Value must be a number");
                 try {
@@ -389,6 +409,10 @@ public class SaveActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (textInputEditText_LDL.getText().toString().equals("") == true){
+                    textInputLayout_LDL.setErrorEnabled(false);
+                    return;
+                }
                 textInputLayout_LDL.setErrorEnabled(true);
                 textInputLayout_LDL.setError("Value must be a number");
                 try {

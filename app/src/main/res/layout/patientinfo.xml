@@ -22,7 +22,7 @@
 
             <TextView
                 style="@style/TextView.SaveLabel"
-                android:text="Patien Info" />
+                android:text="Patient Info" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/info_textinputlayout_Today"
@@ -113,7 +113,7 @@
             <TextView
                 style="@style/TextView.SaveLabel"
                 android:paddingBottom="10dp"
-                android:text="Patien Info" />
+                android:text="Image" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
