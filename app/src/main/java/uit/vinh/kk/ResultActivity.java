@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -36,10 +37,10 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public class ResultActivity extends AppCompatActivity implements View.OnClickListener {
-    ProgressDialog dialogLoadActivity = null;
-    float scale = 1;
-    static Bitmap bitmapOriginalImage = null;
-    static Bitmap bitmapContrastEnhance = null;
+    private ProgressDialog dialogLoadActivity = null;
+    private float scale = 1;
+     static Bitmap bitmapOriginalImage = null;
+     static Bitmap bitmapContrastEnhance = null;
     private String imagePath;
     // presets for rgb conversion
     private static final int RESULTS_TO_SHOW = 3;
@@ -65,7 +66,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
             recognition3ValueTextView,
             recognition4ValueTextView;
     private PhotoView photoView;
-    Button buttonSave;
+    private Button buttonSave;
     private Bitmap rgbFrameBitmap = null;
     private Classifier classifier;
     private Integer sensorOrientation = 0;
@@ -136,7 +137,6 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                         bitmapContrastEnhance = contrastEnhance(bitmapOriginalImage);
                         Log.d("debug", "onCreate: bitmap is not null");
                         Log.d("debug", "onCreate: new bitmaporiginal size " + bitmapOriginalImage.getWidth() + "---" + bitmapOriginalImage.getHeight());
-
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -221,41 +221,17 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    // converts bitmap to byte array which is passed in the tflite graph
-    private void convertBitmapToByteBuffer(Bitmap bitmap) {
-        if (imgData == null) {
-            return;
-        }
-        imgData.rewind();
-        bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-        // loop through all pixels
-        int pixel = 0;
-        for (int i = 0; i < DIM_IMG_SIZE_X; ++i) {
-            for (int j = 0; j < DIM_IMG_SIZE_Y; ++j) {
-                final int val = intValues[pixel++];
-                // get rgb values from intValues where each int holds the rgb values for a pixel.
-                // if quantized, convert each rgb value to a byte, otherwise to a float
-                if (quant) {
-                    imgData.put((byte) ((val >> 16) & 0xFF));
-                    imgData.put((byte) ((val >> 8) & 0xFF));
-                    imgData.put((byte) (val & 0xFF));
-                } else {
-                    imgData.putFloat((((val >> 16) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
-                    imgData.putFloat((((val >> 8) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
-                    imgData.putFloat((((val) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
-                }
-            }
-        }
-    }
-
     private void Classify() {
         // get current bitmap from photoView
         Bitmap bitmap_orig = ((BitmapDrawable) photoView.getDrawable()).getBitmap();
+        bitmap_orig = contrastEnhance(bitmap_orig);
 
+        bitmap_orig = Bitmap.createScaledBitmap(bitmap_orig, (int) (224), (int) (224), true);
+        Log.d("vindeptrai", "Classify: bitmap_origin height == " + bitmap_orig.getHeight());
+        Log.d("vindeptrai", "Classify: bitmap_origin width == " + bitmap_orig.getWidth());
         // trường hợp nếu photoView không có ảnh: -> 5 giá trị xác suất đều là 0%
 
-        // convert bitmap to byte array
-        convertBitmapToByteBuffer(bitmap_orig);
+
         final List<Classifier.Recognition> results =
                 classifier.recognizeImage(bitmap_orig, sensorOrientation);
         Log.d("classify result", results.get(0).toString() + results.get(1).toString() + results.get(2).toString() + results.get(3).toString() + results.get(4).toString());
@@ -264,49 +240,85 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
     protected void showResultsInBottomSheet(List<Classifier.Recognition> results) {
         if (results != null && results.size() >= 5) {
+
             Classifier.Recognition recognition = results.get(0);
             if (recognition != null) {
                 if (recognition.getTitle() != null)
                     recognitionTextView.setText(recognition.getTitle());
-                if (recognition.getConfidence() != null)
-                    recognitionValueTextView.setText(
-                            String.format("%.2f", (100 * recognition.getConfidence())) + "%");
+                if (recognition.getConfidence() != null){
+                    if (recognition.getConfidence() >= CONSTANTS.THRESHOLD){
+                        recognitionValueTextView.setText("Yes");
+                        //recognitionValueTextView.setText(recognition.getConfidence().toString());
+                    }
+                    else{
+                        recognitionValueTextView.setText("No");
+                        //recognitionValueTextView.setText(recognition.getConfidence().toString());
+                    }
+                }
             }
 
             Classifier.Recognition recognition1 = results.get(1);
             if (recognition1 != null) {
                 if (recognition1.getTitle() != null)
                     recognition1TextView.setText(recognition1.getTitle());
-                if (recognition1.getConfidence() != null)
-                    recognition1ValueTextView.setText(
-                            String.format("%.2f", (100 * recognition1.getConfidence())) + "%");
+                if (recognition1.getConfidence() != null){
+                    if (recognition1.getConfidence() >= CONSTANTS.THRESHOLD){
+                        recognition1ValueTextView.setText("Yes");
+                        //recognition1ValueTextView.setText(recognition1.getConfidence().toString());
+                    }
+                    else{
+                        recognition1ValueTextView.setText("No");
+                        //recognition1ValueTextView.setText(recognition1.getConfidence().toString());
+                    }
+                }
             }
 
             Classifier.Recognition recognition2 = results.get(2);
             if (recognition2 != null) {
                 if (recognition2.getTitle() != null)
                     recognition2TextView.setText(recognition2.getTitle());
-                if (recognition2.getConfidence() != null)
-                    recognition2ValueTextView.setText(
-                            String.format("%.2f", (100 * recognition2.getConfidence())) + "%");
+                if (recognition2.getConfidence() != null){
+                    if (recognition2.getConfidence() > CONSTANTS.THRESHOLD){
+                        recognition2ValueTextView.setText("Yes");
+                        //recognition2ValueTextView.setText(recognition2.getConfidence().toString());
+                    }
+                    else{
+                        recognition2ValueTextView.setText("No");
+                        //recognition2ValueTextView.setText(recognition2.getConfidence().toString());
+                    }
+                }
             }
 
             Classifier.Recognition recognition3 = results.get(3);
             if (recognition3 != null) {
                 if (recognition3.getTitle() != null)
                     recognition3TextView.setText(recognition3.getTitle());
-                if (recognition3.getConfidence() != null)
-                    recognition3ValueTextView.setText(
-                            String.format("%.2f", (100 * recognition3.getConfidence())) + "%");
+                if (recognition3.getConfidence() != null){
+                    if (recognition3.getConfidence() >= CONSTANTS.THRESHOLD){
+                        recognition3ValueTextView.setText("Yes");
+                        //recognition3ValueTextView.setText(recognition3.getConfidence().toString());
+                    }
+                    else{
+                        recognition3ValueTextView.setText("No");
+                        //recognition3ValueTextView.setText(recognition3.getConfidence().toString());
+                    }
+                }
             }
 
             Classifier.Recognition recognition4 = results.get(4);
             if (recognition4 != null) {
                 if (recognition4.getTitle() != null)
                     recognition4TextView.setText(recognition4.getTitle());
-                if (recognition4.getConfidence() != null)
-                    recognition4ValueTextView.setText(
-                            String.format("%.2f", (100 * recognition4.getConfidence())) + "%");
+                if (recognition4.getConfidence() != null){
+                    if (recognition4.getConfidence() >= CONSTANTS.THRESHOLD){
+                        recognition4ValueTextView.setText("Yes");
+                        //recognition4ValueTextView.setText(recognition4.getConfidence().toString());
+                    }
+                    else{
+                        recognition4ValueTextView.setText("No");
+                        //recognition4ValueTextView.setText(recognition4.getConfidence().toString());
+                    }
+                }
             }
         }
     }

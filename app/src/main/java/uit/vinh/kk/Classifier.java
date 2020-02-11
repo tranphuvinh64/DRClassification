@@ -27,6 +27,8 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -39,7 +41,15 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Classifier {
+    private static final int BATCH_SIZE = 1;
+    private static final int PIXEL_SIZE = 3;
+
     private static final Logger LOGGER = new Logger();
+    private boolean quant = false;
+    private int[] intValues;
+    private ByteBuffer imgData = null;
+    private int DIM_IMG_SIZE_X = 224;
+    private int DIM_IMG_SIZE_Y = 224;
     /** Number of results to show in the UI. */
     private static final int MAX_RESULTS = 5;
     /** The loaded TensorFlow Lite model. */
@@ -92,9 +102,9 @@ public class Classifier {
 
 
     /** Float MobileNet requires additional normalization of the used input. */
-    private static final float IMAGE_MEAN = 127.5f;
+    private static final float IMAGE_MEAN = 0.0f;
 
-    private static final float IMAGE_STD = 127.5f;
+    private static final float IMAGE_STD = 255.0f;
 
     /**
      * Float model does not need dequantization in the post-processing. Setting mean and std as 0.0f
@@ -118,8 +128,7 @@ public class Classifier {
 
     public Classifier(Activity activity) throws IOException {
         tfliteModel = FileUtil.loadMappedFile(activity, getModelPath());
-
-        tfliteOptions.setNumThreads(numThreads);
+        //tfliteOptions.setNumThreads(numThreads);
         tflite = new Interpreter(tfliteModel, tfliteOptions);
 
         // Loads labels out from the label file.
@@ -167,7 +176,7 @@ public class Classifier {
     }
 
     private String getModelPath(){
-        return "best_model.tflite";
+        return "best_modelHieu.tflite";
     }
 
     private String getLabelPath(){
@@ -259,8 +268,12 @@ public class Classifier {
         // Runs the inference call.
         Trace.beginSection("runInference");
         long startTimeForReference = SystemClock.uptimeMillis();
-        tflite.run(inputImageBuffer.getBuffer(), outputProbabilityBuffer.getBuffer().rewind());
+        Log.d("vinhdeptrai", "recognizeImage: input image type" + inputImageBuffer.getBuffer().getClass());
+        //tflite.run(inputImageBuffer.getBuffer(), outputProbabilityBuffer.getBuffer().rewind());
 
+
+        //convertBitmapToByteBuffer(bitmap);
+        tflite.run(convertBitmapToByteBuffer(bitmap),outputProbabilityBuffer.getBuffer().rewind());
         Log.d("debug", "recognizeImage: outputProbabilityBuffer.getBuffer().rewind() == " + outputProbabilityBuffer.getBuffer().rewind().getClass());
         Log.d("debug", "recognizeImage: inputImageBuffer.getBuffer == " + inputImageBuffer.getBuffer().getClass());
         long endTimeForReference = SystemClock.uptimeMillis();
@@ -283,21 +296,7 @@ public class Classifier {
         return getTopKProbability(labeledProbability);
     }
 
-    private void tempPrintTopKLabels (){
-        for(int i = 0; i<5; i++){
-            sortedLabels.add(
-                    new AbstractMap.SimpleEntry<>(labelList.get(i), labelProbArray[0][i]));
-        }
-        final int size = sortedLabels.size();
-        for (int i = 0; i < size; ++i) {
-            Map.Entry<String, Float> label = sortedLabels.poll();
-            String[] topLables = new String[5];
-            String[] topConfidence = new String[5];
-            topLables[i] = label.getKey();
-            topConfidence[i] = String.format("%.0f%%",label.getValue()*100);
-            Log.d("debug", "tempPrintTopKLabels: vinhdeptrai " + topLables[i] + "----" + topConfidence[i]);
-        }
-    }
+
     /** Gets the top-k results. */
     private static List<Recognition> getTopKProbability(Map<String, Float> labelProb) {
         // Find the best classifications.
@@ -342,4 +341,40 @@ public class Classifier {
                         .build();
         return imageProcessor.process(inputImageBuffer);
     }
+
+
+
+
+    private ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap) {
+        ByteBuffer byteBuffer;
+        int inputSize = 224;
+        if(quant) {
+            byteBuffer = ByteBuffer.allocateDirect(1 * inputSize * inputSize * PIXEL_SIZE);
+        } else {
+            byteBuffer = ByteBuffer.allocateDirect(4 * BATCH_SIZE * inputSize * inputSize * PIXEL_SIZE);
+        }
+
+        byteBuffer.order(ByteOrder.nativeOrder());
+        int[] intValues = new int[inputSize * inputSize];
+        bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+        int pixel = 0;
+        for (int i = 0; i < inputSize; ++i) {
+            for (int j = 0; j < inputSize; ++j) {
+                final int val = intValues[pixel++];
+                if(quant){
+                    byteBuffer.put((byte) ((val >> 16) & 0xFF));
+                    byteBuffer.put((byte) ((val >> 8) & 0xFF));
+                    byteBuffer.put((byte) (val & 0xFF));
+                } else {
+                    byteBuffer.putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+                    byteBuffer.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+                    byteBuffer.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+                    Log.d("vinhdeptrai", "convertBitmapToByteBuffer: " +  val );
+                }
+
+            }
+        }
+        return byteBuffer;
+    }
+
 }

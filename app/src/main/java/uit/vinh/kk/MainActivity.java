@@ -63,26 +63,22 @@ import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Serializable {
-    public static final int REQUEST_PERMISSION = 300;
-    // request code for permission requests to the os for image
-    public static final int REQUEST_IMAGE = 100;
     // will hold uri of image obtained from camera
     private Uri imageUri;
     private String imagePath;
     static DatabaseHelper formDatabase ;
-    ArrayList<DataModel> dataModels;
+    private ArrayList<DataModel> dataModels;
     //private static ArrayList<Form> listForm = loadXMLData("//storage//emulated//0//patientData");
     private static ArrayList<Form> listForm;
-    ListView listView;
+    private ListView listView;
     private static CustomAdapter adapter;
     private static String TAG = "debug";
-    Toolbar searchToolbar;
-    LinearLayout browseImageLinearLayout, infoLinearLayout, useCameraLinearLayout;
-    FrameLayout mainLayout;
-    View blurView;
-    FloatingActionButton floatingActionButtonNew, floatingActionButtonBrowse, floatingActionButtonInfo, floatinngActionButtonUseCamera;
-    Animation fabOpen, fabClose, rotateBackward, rotateForward;
-    boolean isOpen = false;
+    private LinearLayout browseImageLinearLayout, infoLinearLayout, useCameraLinearLayout;
+    private FrameLayout mainLayout;
+    private View blurView;
+    private FloatingActionButton floatingActionButtonNew, floatingActionButtonBrowse, floatingActionButtonInfo, floatinngActionButtonUseCamera;
+    private Animation fabOpen, fabClose, rotateBackward, rotateForward;
+    private boolean isOpen = false;
     private static final int RC_CAMERA = 3000;
     private ImageView imgImport;
     private static final Logger LOGGER = new Logger();
@@ -104,18 +100,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, REQUEST_PERMISSION);
+            ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, CONSTANTS.REQUEST_PERMISSION);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    REQUEST_PERMISSION);
+                    CONSTANTS.REQUEST_PERMISSION);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                     && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        REQUEST_PERMISSION);
+                        CONSTANTS.REQUEST_PERMISSION);
             }
 
         // temp
@@ -270,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == REQUEST_PERMISSION) {
+        if (requestCode == CONSTANTS.REQUEST_PERMISSION) {
             if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 Toast.makeText(getApplicationContext(),"This application needs read, write, and camera permissions to run. Application now closing.",Toast.LENGTH_LONG);
                 System.exit(0);}}
@@ -347,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 // start camera, and wait for it to finish
-                startActivityForResult(intent, REQUEST_IMAGE);
+                startActivityForResult(intent, CONSTANTS.REQUEST_IMAGE);
         }
         
     }
@@ -381,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }.start();
 
         }
-        if ( requestCode == REQUEST_IMAGE && resultCode == RESULT_OK){
+        if ( requestCode == CONSTANTS.REQUEST_IMAGE && resultCode == RESULT_OK){
             ProgressDialog mProgressDialog = ProgressDialog.show(this, "Please wait","Classifying", true);
             new Thread() {
                 @Override
@@ -527,43 +523,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private String handleSplitDMYString (String[] today, String[] studyDate){
         String finalString = "N/A";
-        if (today[0].equals(studyDate[0])){
+        if (today[2].equals(studyDate[2])){
             switch (studyDate[1]){
                 case "01":
-                    finalString = "Jan " + studyDate[2];
+                    finalString = "Jan " + studyDate[0];
                     break;
                 case "02":
-                    finalString = "Feb " + studyDate[2];
+                    finalString = "Feb " + studyDate[0];
                     break;
                 case "03":
-                    finalString = "Mar " + studyDate[2];
+                    finalString = "Mar " + studyDate[0];
                     break;
                 case "04":
-                    finalString = "Apr " + studyDate[2];
+                    finalString = "Apr " + studyDate[0];
                     break;
                 case "05":
-                    finalString = "May " + studyDate[2];
+                    finalString = "May " + studyDate[0];
                     break;
                 case "06":
-                    finalString = "Jun " + studyDate[2];
+                    finalString = "Jun " + studyDate[0];
                     break;
                 case "07":
-                    finalString = "Jul " + studyDate[2];
+                    finalString = "Jul " + studyDate[0];
                     break;
                 case "08":
-                    finalString = "Aug " + studyDate[2];
+                    finalString = "Aug " + studyDate[0];
                     break;
                 case "09":
-                    finalString = "Sep " + studyDate[2];
+                    finalString = "Sep " + studyDate[0];
                     break;
                 case "10":
-                    finalString = "Oct " + studyDate[2];
+                    finalString = "Oct " + studyDate[0];
                     break;
                 case "11":
-                    finalString = "Nov " + studyDate[2];
+                    finalString = "Nov " + studyDate[0];
                     break;
                 case "12":
-                    finalString = "Dec " + studyDate[2];
+                    finalString = "Dec " + studyDate[0];
                     break;
             }
         }

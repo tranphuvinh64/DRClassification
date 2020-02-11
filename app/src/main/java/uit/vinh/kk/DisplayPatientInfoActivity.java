@@ -10,7 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,10 +63,11 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
 
     private Spinner spinner_sex;
     private Spinner spinner_result;
+    private RadioButton rbt_male;
+    private RadioButton rbt_female;
 
     private PhotoView photoViewOriginalImage;
     private PhotoView photoViewContrastEnhnace;
-    private ImageView imageViewOriginalImage;
     static {
         if(!OpenCVLoader.initDebug())
             Log.d("...", "OpenCv load fail!");
@@ -107,6 +108,8 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         textInputLayout_Note = findViewById(R.id.info_textinputlayout_MedicalHistory);
 
         spinner_result = findViewById(R.id.info_spinner_result);
+        rbt_male = findViewById(R.id.rbt_male);
+        rbt_female = findViewById(R.id.rbt_female);
 
         photoViewOriginalImage = findViewById(R.id.info_photoview_OriginalImage);
         photoViewContrastEnhnace = findViewById(R.id.info_photoview_ContrastEnhance);
@@ -135,7 +138,14 @@ public class DisplayPatientInfoActivity extends AppCompatActivity{
         textInputEditText_Note.setKeyListener(null);
 
 
-
+        rbt_female.setEnabled(false);
+        rbt_male.setEnabled(false);
+        if (prevForm.getSex().equals("Male")){
+            rbt_male.setChecked(true);
+        }
+        else{
+            rbt_female.setChecked(true);
+        }
         spinner_result.setEnabled(false);
         //spinner_sex.setEnabled(false);
 

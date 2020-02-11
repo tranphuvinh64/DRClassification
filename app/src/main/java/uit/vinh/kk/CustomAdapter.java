@@ -18,7 +18,7 @@ import java.util.Locale;
 public class CustomAdapter extends ArrayAdapter<DataModel> implements View.OnClickListener{
 
     private ArrayList<DataModel> dataSet;
-    Context mContext;
+    private Context mContext;
     private  List<DataModel> modelList;
     // View lookup cache
     private static class ViewHolder {

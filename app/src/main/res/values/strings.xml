@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DRClassification</string>
+    <string name="app_name">Diabetic Retinopathy cheap test</string>
     <string name="btnImportImage">browse image</string>
     <string name="btnClassify">Classify image</string>
 
@@ -15,4 +15,10 @@
         <item>Severe</item>
         <item>Proliferative</item>
     </string-array>
+
+    <string name="author">Vinh Tran - Hieu Nguyen Phan Duy</string>
+    <string name="introductioncontent">Diabetic Retinopathy Cheap Test is an application which is used for</string>
+    <string name="features"></string>
+    <string name="howtouse"></string>
+    <string name="appinfo"></string>
 </resources>

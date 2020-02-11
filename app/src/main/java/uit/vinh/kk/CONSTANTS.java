@@ -36,6 +36,8 @@ public final class CONSTANTS {
     // constants for MainActivity
     public static final int MAX_LENGTH_THIRD_STRING = 35;
     public static final int MAX_LENGTH_FIRST_STRING = 35;
+
+
     public static final int COLUMN_ID_INDEX = 0;
     public static final int COLUMN_TODAY_INDEX = 1;
     public static final int COLUMN_PATIENT_NAME_INDEX = 2;
@@ -64,5 +66,12 @@ public final class CONSTANTS {
     public static final int MAX_WIDTH = 6300;
 
     public static final String DateFormat = "dd/MM/yyyy";
+
+    // Permission
+    public static final int REQUEST_PERMISSION = 300;
+    public static final int REQUEST_IMAGE = 100;
+
+
+    public static final float THRESHOLD = (float)0.5 ;
 
 }

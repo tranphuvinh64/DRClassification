@@ -47,11 +47,10 @@ import java.util.Date;
 import java.util.Locale;
 
 public class SaveActivity extends AppCompatActivity {
-    Runnable saveImageRunnable;
-    DatabaseHelper formDatabase;
+    private DatabaseHelper formDatabase;
 
-    static Bitmap bitmapOriginalImage =null;
-    static Bitmap bitmapContrastEnhance = null;
+    private static Bitmap bitmapOriginalImage =null;
+    private static Bitmap bitmapContrastEnhance = null;
 
     private TextInputLayout textInputLayout_Today;
     private TextInputLayout textInputLayout_PatientName;
@@ -88,9 +87,7 @@ public class SaveActivity extends AppCompatActivity {
 
     private PhotoView photoViewOriginalImage;
     private PhotoView photoViewContrastEnhnace;
-    private ImageView imageViewOriginalImage;
     private File directory;
-    private Thread saveImageThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -465,7 +462,7 @@ public class SaveActivity extends AppCompatActivity {
                     new Thread() {
                         @Override
                         public void run() {
-                            WithoutMultiThread();
+                            saveWithoutMultiThread();
                             try {
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -491,7 +488,7 @@ public class SaveActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void WithoutMultiThread() {
+    private void saveWithoutMultiThread() {
         String SaveAs = (String) getIntent().getSerializableExtra("Save As");
         Form prevForm = (Form) getIntent().getSerializableExtra("oldform");
         Form saveForm = new Form();
