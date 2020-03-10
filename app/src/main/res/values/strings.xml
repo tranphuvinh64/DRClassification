@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Diabetic Retinopathy cheap test</string>
+    <string name="app_name">Diabetic Retinopathy Classifier</string>
     <string name="btnImportImage">browse image</string>
     <string name="btnClassify">Classify image</string>
 

@@ -179,12 +179,18 @@ public class Form implements Serializable {
                 '}';
     }
 
+
+    public String[] printCSVFormat(){
+        return new String []{ID,today,name,dateOfBirth,sex,personalID,classificationResult,
+                bloodPressure_Systolic,bloodPressure_Diastolic,bloodSugar,hba1c,cholesterolHDL,
+                cholesterolLDL,medicalHistory,note};
+    }
     public static Comparator<Form> CountDate = new Comparator<Form>() {
         @Override
         public int compare(Form o1, Form o2) {
             String date1 = o1.getToday();
             String date2 = o2.getToday();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat(CONSTANTS.DateFormat, Locale.getDefault());
             try {
                 Date date1_paresd = sdf.parse(date1);
                 Date date2_parsed = sdf.parse(date2);

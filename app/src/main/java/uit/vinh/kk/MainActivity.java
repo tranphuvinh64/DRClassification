@@ -42,14 +42,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.view.MenuItemCompat;
 
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.opencsv.CSVWriter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -58,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 //import org.tensorflow.lite.Interpreter;
 
@@ -73,10 +78,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ListView listView;
     private static CustomAdapter adapter;
     private static String TAG = "debug";
-    private LinearLayout browseImageLinearLayout, infoLinearLayout, useCameraLinearLayout;
+    private LinearLayout browseImageLinearLayout, infoLinearLayout, useCameraLinearLayout, exportLinearLayout;
     private FrameLayout mainLayout;
     private View blurView;
-    private FloatingActionButton floatingActionButtonNew, floatingActionButtonBrowse, floatingActionButtonInfo, floatinngActionButtonUseCamera;
+    private FloatingActionButton floatingActionButtonNew, floatingActionButtonBrowse, floatingActionButtonInfo, floatinngActionButtonUseCamera, floatingActionButtonExport;
     private Animation fabOpen, fabClose, rotateBackward, rotateForward;
     private boolean isOpen = false;
     private static final int RC_CAMERA = 3000;
@@ -128,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         browseImageLinearLayout = findViewById(R.id.browseimage_linear_layout);
         infoLinearLayout = findViewById(R.id.info_linear_layout);
         useCameraLinearLayout = findViewById(R.id.usecamera_linear_layout);
+        exportLinearLayout = findViewById(R.id.export_linear_layout);
+
         mainLayout = findViewById(R.id.main);
         mainLayout.setOnClickListener(this);
 
@@ -139,14 +146,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         floatingActionButtonBrowse = findViewById(R.id.browseimage_floating_action_button);
         floatingActionButtonInfo = findViewById(R.id.info_floating_action_button);
         floatinngActionButtonUseCamera = findViewById(R.id.usecamera_floating_action_button );
-
+        floatingActionButtonExport = findViewById(R.id.export_floating_action_button);
 
         // set action listener
         floatingActionButtonNew.setOnClickListener(this);
         floatingActionButtonBrowse.setOnClickListener(this);
         floatingActionButtonInfo.setOnClickListener(this);
         floatinngActionButtonUseCamera.setOnClickListener(this);
-
+        floatingActionButtonExport.setOnClickListener(this);
 
         fabOpen = AnimationUtils.loadAnimation(this,R.anim.fab_open);
         fabClose = AnimationUtils.loadAnimation(this,R.anim.fab_close);
@@ -208,8 +215,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
-
-
     }
 
 
@@ -341,9 +346,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
                 // start camera, and wait for it to finish
                 startActivityForResult(intent, CONSTANTS.REQUEST_IMAGE);
+        }
+        else if(v.getId() == R.id.export_floating_action_button ){
+            animateFAB();
+            Export2CSV(loadSQLiteData());
+            Toast.makeText(getApplicationContext(), "output.csv is exported at " + CONSTANTS.FOLDER_PATH_STORE_IMG, Toast.LENGTH_LONG).show();
         }
         
     }
@@ -460,6 +470,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             browseImageLinearLayout.startAnimation(fabClose);
             useCameraLinearLayout.startAnimation(fabClose);
             infoLinearLayout.startAnimation(fabClose);
+            exportLinearLayout.startAnimation(fabClose);
             floatingActionButtonBrowse.setClickable(false);
             floatingActionButtonInfo.setClickable(false);
             View v = findViewById( R.id.shadowView);
@@ -473,6 +484,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             browseImageLinearLayout.startAnimation(fabOpen);
             useCameraLinearLayout.startAnimation(fabOpen);
             infoLinearLayout.startAnimation(fabOpen);
+            exportLinearLayout.startAnimation(fabOpen);
             floatingActionButtonBrowse.setClickable(true);
             floatingActionButtonInfo.setClickable(true);
             View v = findViewById( R.id.shadowView);
@@ -592,4 +604,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return dataModels;
     }
+
+    private void Export2CSV(ArrayList<Form> database){
+        String csv = CONSTANTS.FOLDER_PATH_STORE_IMG + File.separator + "output.csv";
+        CSVWriter writer = null;
+        try {
+            writer = new CSVWriter(new FileWriter(csv));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<String[]> data = new ArrayList<String[]>();
+        data.add(new String []{"ID","today","name","dateOfBirth","sex","personalID","classificationResult",
+                "bloodPressure_Systolic","bloodPressure_Diastolic","bloodSugar","hba1c","cholesterolHDL",
+                "cholesterolLDL","medicalHistory","note"});
+        for (Form row: database){
+            data.add(row.printCSVFormat());
+        }
+        writer.writeAll(data);
+
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

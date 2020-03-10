@@ -29,42 +29,35 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
     implementation 'com.github.esafirm.android-image-picker:imagepicker:2.2.0'
     // for experimental rx picker
     implementation 'com.github.esafirm.android-image-picker:rximagepicker:2.2.0'
     // If you have a problem with Glide, please use the same Glide version or simply open an issue
     implementation 'com.github.bumptech.glide:glide:4.5.0'
     implementation 'org.tensorflow:tensorflow-lite:+'
-    implementation "com.android.support:support-compat:28.0.0"
-
+    implementation 'com.android.support:support-compat:28.0.0'
     implementation 'com.google.android.material:material:1.2.0-alpha02'
-
     // Build off of nightly TensorFlow Lite
     implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly'
     implementation 'org.tensorflow:tensorflow-lite-gpu:0.0.0-nightly'
     implementation 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly'
-
     // fab button
     implementation 'com.google.android.material:material:<version>'
-
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
-
     // text field design
     //implementation 'com.google.android.material:material:1.1.0-alpha09'
     implementation 'com.google.android.material:material:1.0.0-beta01'
     //implementation 'com.google.android.material:material:1.1.0-alpha06'
     implementation 'com.android.support:design:28.0.0-alpha1'
-
     // zoom image
     //implementation 'com.github.chrisbanes:PhotoView:latest.release.here'
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     implementation project(path: ':openCVLibrary349')
-
+    implementation files('libs/opencsv-5.1.jar')
 }

@@ -246,6 +246,10 @@ public class SaveActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (textInputEditText_DateOfBirth.getText().toString().equals("") == true){
+                    textInputLayout_DateOfBirth.setErrorEnabled(false);
+                    return;
+                }
                 SimpleDateFormat sdf = new SimpleDateFormat(CONSTANTS.DateFormat, Locale.getDefault());
                 textInputLayout_DateOfBirth.setErrorEnabled(true);
                 textInputLayout_DateOfBirth.setError("Error date format");
@@ -278,7 +282,7 @@ public class SaveActivity extends AppCompatActivity {
                 textInputLayout_Systolic.setErrorEnabled(true);
                 textInputLayout_Systolic.setError("Value must be a number");
                 try {
-                    float value = Integer.parseInt(textInputEditText_Systolic.getText().toString());
+                    float value = Float.parseFloat(textInputEditText_Systolic.getText().toString());
                     textInputLayout_Systolic.setErrorEnabled(false);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -305,7 +309,7 @@ public class SaveActivity extends AppCompatActivity {
                 textInputLayout_Diastolic.setErrorEnabled(true);
                 textInputLayout_Diastolic.setError("Value must be a number");
                 try {
-                    float value = Integer.parseInt(textInputEditText_Diastolic.getText().toString());
+                    float value = Float.parseFloat(textInputEditText_Diastolic.getText().toString());
                     textInputLayout_Diastolic.setErrorEnabled(false);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -332,7 +336,7 @@ public class SaveActivity extends AppCompatActivity {
                 textInputLayout_BloodSugar.setErrorEnabled(true);
                 textInputLayout_BloodSugar.setError("Value must be a number");
                 try {
-                    float value = Integer.parseInt(textInputEditText_BloodSugar.getText().toString());
+                    float value = Float.parseFloat(textInputEditText_BloodSugar.getText().toString());
                     textInputLayout_BloodSugar.setErrorEnabled(false);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -359,7 +363,7 @@ public class SaveActivity extends AppCompatActivity {
                 textInputLayout_Hba1c.setErrorEnabled(true);
                 textInputLayout_Hba1c.setError("Value must be a number");
                 try {
-                    float value = Integer.parseInt(textInputEditText_Hba1c.getText().toString());
+                    float value = Float.parseFloat(textInputEditText_Hba1c.getText().toString());
                     textInputLayout_Hba1c.setErrorEnabled(false);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -386,7 +390,7 @@ public class SaveActivity extends AppCompatActivity {
                 textInputLayout_HDL.setErrorEnabled(true);
                 textInputLayout_HDL.setError("Value must be a number");
                 try {
-                    float value = Integer.parseInt(textInputEditText_HDL.getText().toString());
+                    float value = Float.parseFloat(textInputEditText_HDL.getText().toString());
                     textInputLayout_HDL.setErrorEnabled(false);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -413,7 +417,7 @@ public class SaveActivity extends AppCompatActivity {
                 textInputLayout_LDL.setErrorEnabled(true);
                 textInputLayout_LDL.setError("Value must be a number");
                 try {
-                    float value = Integer.parseInt(textInputEditText_LDL.getText().toString());
+                    float value = Float.parseFloat(textInputEditText_LDL.getText().toString());
                     textInputLayout_LDL.setErrorEnabled(false);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -451,7 +455,9 @@ public class SaveActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_save:
                 // check the input is validate value
-                if (textInputLayout_Today.isErrorEnabled() || textInputLayout_DateOfBirth.isErrorEnabled() || textInputLayout_Systolic.isErrorEnabled()
+                if (textInputEditText_PatientName.getText().toString().equals("") == true && textInputEditText_PersonalID.getText().toString().equals("") == true){
+                    Toast.makeText(getApplicationContext(), "Name or Personal ID need to be filled", Toast.LENGTH_SHORT).show();
+                } else if (textInputLayout_Today.isErrorEnabled() || textInputLayout_DateOfBirth.isErrorEnabled() || textInputLayout_Systolic.isErrorEnabled()
                         || textInputLayout_Diastolic.isErrorEnabled() || textInputLayout_BloodSugar.isErrorEnabled() || textInputLayout_Hba1c.isErrorEnabled()
                         || textInputLayout_LDL.isErrorEnabled() || textInputLayout_HDL.isErrorEnabled()) {
                     Toast.makeText(getApplicationContext(), "Some input is incorrect", Toast.LENGTH_SHORT).show();

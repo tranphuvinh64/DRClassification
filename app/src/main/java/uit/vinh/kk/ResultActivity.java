@@ -244,85 +244,20 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
     protected void showResultsInBottomSheet(List<Classifier.Recognition> results) {
         if (results != null && results.size() >= 5) {
+            SetText_RecognitionValueTextView(recognitionTextView,recognitionValueTextView,results.get(0));
+            SetText_RecognitionValueTextView(recognition1TextView,recognition1ValueTextView,results.get(1));
+            SetText_RecognitionValueTextView(recognition2TextView,recognition2ValueTextView,results.get(2));
+            SetText_RecognitionValueTextView(recognition3TextView,recognition3ValueTextView,results.get(3));
+            SetText_RecognitionValueTextView(recognition4TextView,recognition4ValueTextView,results.get(4));
+        }
+    }
 
-            Classifier.Recognition recognition = results.get(0);
-            if (recognition != null) {
-                if (recognition.getTitle() != null)
-                    recognitionTextView.setText(recognition.getTitle());
-                if (recognition.getConfidence() != null){
-                    if (recognition.getConfidence() >= CONSTANTS.THRESHOLD){
-//                        recognitionValueTextView.setText("Yes");
-                        recognitionValueTextView.setText(recognition.getConfidence().toString());
-                    }
-                    else{
-//                        recognitionValueTextView.setText("No");
-                        recognitionValueTextView.setText(recognition.getConfidence().toString());
-                    }
-                }
-            }
-
-            Classifier.Recognition recognition1 = results.get(1);
-            if (recognition1 != null) {
-                if (recognition1.getTitle() != null)
-                    recognition1TextView.setText(recognition1.getTitle());
-                if (recognition1.getConfidence() != null){
-                    if (recognition1.getConfidence() >= CONSTANTS.THRESHOLD){
-//                        recognition1ValueTextView.setText("Yes");
-                        recognition1ValueTextView.setText(recognition1.getConfidence().toString());
-                    }
-                    else{
-//                        recognition1ValueTextView.setText("No");
-                        recognition1ValueTextView.setText(recognition1.getConfidence().toString());
-                    }
-                }
-            }
-
-            Classifier.Recognition recognition2 = results.get(2);
-            if (recognition2 != null) {
-                if (recognition2.getTitle() != null)
-                    recognition2TextView.setText(recognition2.getTitle());
-                if (recognition2.getConfidence() != null){
-                    if (recognition2.getConfidence() > CONSTANTS.THRESHOLD){
-//                        recognition2ValueTextView.setText("Yes");
-                        recognition2ValueTextView.setText(recognition2.getConfidence().toString());
-                    }
-                    else{
-//                        recognition2ValueTextView.setText("No");
-                        recognition2ValueTextView.setText(recognition2.getConfidence().toString());
-                    }
-                }
-            }
-
-            Classifier.Recognition recognition3 = results.get(3);
-            if (recognition3 != null) {
-                if (recognition3.getTitle() != null)
-                    recognition3TextView.setText(recognition3.getTitle());
-                if (recognition3.getConfidence() != null){
-                    if (recognition3.getConfidence() >= CONSTANTS.THRESHOLD){
-//                        recognition3ValueTextView.setText("Yes");
-                        recognition3ValueTextView.setText(recognition3.getConfidence().toString());
-                    }
-                    else{
-//                        recognition3ValueTextView.setText("No");
-                        recognition3ValueTextView.setText(recognition3.getConfidence().toString());
-                    }
-                }
-            }
-
-            Classifier.Recognition recognition4 = results.get(4);
-            if (recognition4 != null) {
-                if (recognition4.getTitle() != null)
-                    recognition4TextView.setText(recognition4.getTitle());
-                if (recognition4.getConfidence() != null){
-                    if (recognition4.getConfidence() >= CONSTANTS.THRESHOLD){
-//                        recognition4ValueTextView.setText("Yes");
-                        recognition4ValueTextView.setText(recognition4.getConfidence().toString());
-                    }
-                    else{
-//                        recognition4ValueTextView.setText("No");
-                        recognition4ValueTextView.setText(recognition4.getConfidence().toString());
-                    }
-                }
+    private void SetText_RecognitionValueTextView (TextView recognitionTextView, TextView recognitionValueTextView, Classifier.Recognition recognition){
+        if (recognition != null) {
+            if (recognition.getTitle() != null)
+                recognitionTextView.setText(recognition.getTitle());
+            if (recognition.getConfidence() != null){
+                recognitionValueTextView.setText(String.format("%.2f",recognition.getConfidence()*100) + "%");
             }
         }
     }
