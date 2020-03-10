@@ -310,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
+
     public void showInputMethod(final EditText v) {
         v.requestFocus();
         InputMethodManager imm = (InputMethodManager)getApplicationContext()
