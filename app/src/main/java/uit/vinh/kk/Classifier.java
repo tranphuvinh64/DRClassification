@@ -6,9 +6,9 @@ import android.graphics.RectF;
 import android.os.SystemClock;
 import android.os.Trace;
 import android.util.Log;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
@@ -25,20 +25,18 @@ import org.tensorflow.lite.support.image.ops.Rot90Op;
 import org.tensorflow.lite.support.label.TensorLabel;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
-import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.nio.channels.FileChannel;
 
 public class Classifier {
     private static final int BATCH_SIZE = 1;
@@ -46,10 +44,11 @@ public class Classifier {
 
     private static final Logger LOGGER = new Logger();
     private boolean quant = false;
-    private int[] intValues;
+
     private ByteBuffer imgData = null;
     private int DIM_IMG_SIZE_X = 224;
     private int DIM_IMG_SIZE_Y = 224;
+    private int[] intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
     /** Number of results to show in the UI. */
     private static final int MAX_RESULTS = 5;
     /** The loaded TensorFlow Lite model. */
@@ -120,23 +119,39 @@ public class Classifier {
      * @param activity The current Activity.
      * @return A classifier with the desired configuration.
      */
-    public static Classifier create(Activity activity)
+    public static Classifier create(Activity activity,AssetManager assetManager)
             throws IOException {
+
         return new Classifier(activity);
+    }
+
+    private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
+        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(getModelPath());
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+        FileChannel fileChannel = inputStream.getChannel();
+        long startOffset = fileDescriptor.getStartOffset();
+        long declaredLength = fileDescriptor.getDeclaredLength();
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
 
     public Classifier(Activity activity) throws IOException {
-        tfliteModel = FileUtil.loadMappedFile(activity, getModelPath());
+//        tfliteModel = FileUtil.loadMappedFile(activity, getModelPath());
+        String modelFilename = "best_modelHieu.tflite";
         //tfliteOptions.setNumThreads(numThreads);
-        tflite = new Interpreter(tfliteModel, tfliteOptions);
 
+        tflite = new Interpreter(loadModelFile(activity), tfliteOptions);
+        imgData =
+                ByteBuffer.allocateDirect(
+                        4 * BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * PIXEL_SIZE);
+        imgData.order(ByteOrder.nativeOrder());
         // Loads labels out from the label file.
         labels = FileUtil.loadLabels(activity, getLabelPath());
 
         // Reads type and shape of input and output tensors, respectively.
         int imageTensorIndex = 0;
         int[] imageShape = tflite.getInputTensor(imageTensorIndex).shape(); // {1, height, width, 3}
+
         imageSizeY = imageShape[1];
         imageSizeX = imageShape[2];
         Log.d("debug", "Classifier: imageSizeX == " + imageSizeX);
@@ -254,13 +269,13 @@ public class Classifier {
     }
 
     /** Runs inference and returns the classification results. */
-    public List<Recognition> recognizeImage(final Bitmap bitmap, int sensorOrientation) {
+    public List<Recognition> recognizeImage(final Bitmap bitmap) {
         // Logs this method so that it can be analyzed with systrace.
         Trace.beginSection("recognizeImage");
 
         Trace.beginSection("loadImage");
         long startTimeForLoadImage = SystemClock.uptimeMillis();
-        inputImageBuffer = loadImage(bitmap, sensorOrientation);
+
         long endTimeForLoadImage = SystemClock.uptimeMillis();
         Trace.endSection();
         LOGGER.v("Timecost to load the image: " + (endTimeForLoadImage - startTimeForLoadImage));
@@ -268,14 +283,17 @@ public class Classifier {
         // Runs the inference call.
         Trace.beginSection("runInference");
         long startTimeForReference = SystemClock.uptimeMillis();
-        Log.d("vinhdeptrai", "recognizeImage: input image type" + inputImageBuffer.getBuffer().getClass());
+//        Log.d("vinhdeptrai", "recognizeImage: input image type" + convertBitmapToByteBuffer(bitmap));
         //tflite.run(inputImageBuffer.getBuffer(), outputProbabilityBuffer.getBuffer().rewind());
 
-
+        ByteBuffer byteBuffer = convertBitmapToByteBuffer(bitmap);
+        inputImageBuffer.load(bitmap);
+        float[][] result = new float[1][5];
+        Log.d("debug", "recognizeImage: byteBuffer == "+ byteBuffer);
         //convertBitmapToByteBuffer(bitmap);
-        tflite.run(convertBitmapToByteBuffer(bitmap),outputProbabilityBuffer.getBuffer().rewind());
-        Log.d("debug", "recognizeImage: outputProbabilityBuffer.getBuffer().rewind() == " + outputProbabilityBuffer.getBuffer().rewind().getClass());
-        Log.d("debug", "recognizeImage: inputImageBuffer.getBuffer == " + inputImageBuffer.getBuffer().getClass());
+        tflite.run(inputImageBuffer.getBuffer(),outputProbabilityBuffer.getBuffer().rewind());
+        Log.d("debug", "recognizeImage: outputProbabilityBuffer.getBuffer().rewind() == "+ result);
+        Log.d("debug", "recognizeImage: inputImageBuffer.getBuffer == " + outputProbabilityBuffer.getBuffer().rewind());
         long endTimeForReference = SystemClock.uptimeMillis();
         Trace.endSection();
         LOGGER.v("Timecost to run model inference: " + (endTimeForReference - startTimeForReference));
@@ -335,7 +353,7 @@ public class Classifier {
         ImageProcessor imageProcessor =
                 new ImageProcessor.Builder()
                         .add(new ResizeWithCropOrPadOp(cropSize, cropSize))
-                        .add(new ResizeOp(imageSizeX, imageSizeY, ResizeMethod.BILINEAR))
+                        .add(new ResizeOp(imageSizeX, imageSizeY, ResizeMethod.NEAREST_NEIGHBOR))
                         .add(new Rot90Op(numRoration))
                         .add(getPreprocessNormalizeOp())
                         .build();
@@ -346,35 +364,22 @@ public class Classifier {
 
 
     private ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap) {
-        ByteBuffer byteBuffer;
-        int inputSize = 224;
-        if(quant) {
-            byteBuffer = ByteBuffer.allocateDirect(1 * inputSize * inputSize * PIXEL_SIZE);
-        } else {
-            byteBuffer = ByteBuffer.allocateDirect(4 * BATCH_SIZE * inputSize * inputSize * PIXEL_SIZE);
-        }
-
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * PIXEL_SIZE);
         byteBuffer.order(ByteOrder.nativeOrder());
-        int[] intValues = new int[inputSize * inputSize];
+        int[] intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
         bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
         int pixel = 0;
-        for (int i = 0; i < inputSize; ++i) {
-            for (int j = 0; j < inputSize; ++j) {
+        for (int i = 0; i < DIM_IMG_SIZE_X; ++i) {
+            for (int j = 0; j < DIM_IMG_SIZE_X; ++j) {
                 final int val = intValues[pixel++];
-                if(quant){
-                    byteBuffer.put((byte) ((val >> 16) & 0xFF));
-                    byteBuffer.put((byte) ((val >> 8) & 0xFF));
-                    byteBuffer.put((byte) (val & 0xFF));
-                } else {
-                    byteBuffer.putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
-                    byteBuffer.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
-                    byteBuffer.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
-                    Log.d("vinhdeptrai", "convertBitmapToByteBuffer: " +  val );
-                }
-
+                byteBuffer.putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+                byteBuffer.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+                byteBuffer.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
             }
         }
         return byteBuffer;
+
     }
+
 
 }

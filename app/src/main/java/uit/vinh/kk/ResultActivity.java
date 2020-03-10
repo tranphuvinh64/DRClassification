@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.res.AssetManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -39,8 +40,8 @@ import java.util.List;
 public class ResultActivity extends AppCompatActivity implements View.OnClickListener {
     private ProgressDialog dialogLoadActivity = null;
     private float scale = 1;
-     static Bitmap bitmapOriginalImage = null;
-     static Bitmap bitmapContrastEnhance = null;
+    static Bitmap bitmapOriginalImage = null;
+    static Bitmap bitmapContrastEnhance = null;
     private String imagePath;
     // presets for rgb conversion
     private static final int RESULTS_TO_SHOW = 3;
@@ -69,7 +70,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     private Button buttonSave;
     private Bitmap rgbFrameBitmap = null;
     private Classifier classifier;
-    private Integer sensorOrientation = 0;
+    private Integer sensorOrientation;
 
     static {
         if (!OpenCVLoader.initDebug())
@@ -130,13 +131,14 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                                 }
                             }
                             Log.d("debug", "onCreate: selected scale == " + scale);
-                            bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage, (int) (bitmapOriginalImage.getWidth() * scale), (int) (bitmapOriginalImage.getHeight() * scale), true);
+                            bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage, 224, 224, false);
 
                             Log.d("debug", "run: bitmap contrast enhance is " + bitmapContrastEnhance);
                         }
+                        bitmapOriginalImage = Bitmap.createScaledBitmap(bitmapOriginalImage, 224, 224, false);
                         bitmapContrastEnhance = contrastEnhance(bitmapOriginalImage);
                         Log.d("debug", "onCreate: bitmap is not null");
-                        Log.d("debug", "onCreate: new bitmaporiginal size " + bitmapOriginalImage.getWidth() + "---" + bitmapOriginalImage.getHeight());
+                        Log.d("debug", "onCreate: new bitmaporiginal size " + bitmapContrastEnhance.getWidth() + "---" + bitmapContrastEnhance.getHeight());
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -148,6 +150,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             photoView.setImageBitmap(bitmapOriginalImage);
                             Classify();
                             dialogLoadActivity.dismiss();
@@ -200,8 +203,8 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         Utils.bitmapToMat(bpm32, matsrc);
         Imgproc.cvtColor(matsrc, image, Imgproc.COLOR_BGR2RGB);
         org.opencv.core.Size s = new Size(0, 0);
-        Imgproc.GaussianBlur(matsrc, gaussianBlurSrc, s, 10);
-        Core.addWeighted(matsrc, 4, gaussianBlurSrc, -4, 128, matdest);
+        Imgproc.GaussianBlur(image, gaussianBlurSrc, new Size(0,0), 10);
+        Core.addWeighted(image, 4, gaussianBlurSrc, -4, 128, matdest);
         Bitmap bitmapdest = Bitmap.createBitmap(matdest.cols(), matdest.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(matdest, bitmapdest);
         return bitmapdest;
@@ -221,19 +224,20 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+
     private void Classify() {
         // get current bitmap from photoView
         Bitmap bitmap_orig = ((BitmapDrawable) photoView.getDrawable()).getBitmap();
-        bitmap_orig = contrastEnhance(bitmap_orig);
-
-        bitmap_orig = Bitmap.createScaledBitmap(bitmap_orig, (int) (224), (int) (224), true);
-        Log.d("vindeptrai", "Classify: bitmap_origin height == " + bitmap_orig.getHeight());
-        Log.d("vindeptrai", "Classify: bitmap_origin width == " + bitmap_orig.getWidth());
+        Bitmap bitmap_Enhance = contrastEnhance(bitmap_orig);
+        Log.d("vindeptrai", "Classify: bitmap_orig  == " + bitmap_Enhance);
+        bitmap_Enhance = Bitmap.createScaledBitmap(bitmap_Enhance, (int) (224), (int) (224), false);
+        Log.d("vindeptrai", "Classify: bitmap_origin height == " + bitmap_Enhance.getHeight());
+        Log.d("vindeptrai", "Classify: bitmap_origin width == " + bitmap_Enhance.getWidth());
         // trường hợp nếu photoView không có ảnh: -> 5 giá trị xác suất đều là 0%
 
 
         final List<Classifier.Recognition> results =
-                classifier.recognizeImage(bitmap_orig, sensorOrientation);
+                classifier.recognizeImage(bitmap_Enhance);
         Log.d("classify result", results.get(0).toString() + results.get(1).toString() + results.get(2).toString() + results.get(3).toString() + results.get(4).toString());
         showResultsInBottomSheet(results);
     }
@@ -247,12 +251,12 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     recognitionTextView.setText(recognition.getTitle());
                 if (recognition.getConfidence() != null){
                     if (recognition.getConfidence() >= CONSTANTS.THRESHOLD){
-                        recognitionValueTextView.setText("Yes");
-                        //recognitionValueTextView.setText(recognition.getConfidence().toString());
+//                        recognitionValueTextView.setText("Yes");
+                        recognitionValueTextView.setText(recognition.getConfidence().toString());
                     }
                     else{
-                        recognitionValueTextView.setText("No");
-                        //recognitionValueTextView.setText(recognition.getConfidence().toString());
+//                        recognitionValueTextView.setText("No");
+                        recognitionValueTextView.setText(recognition.getConfidence().toString());
                     }
                 }
             }
@@ -263,12 +267,12 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     recognition1TextView.setText(recognition1.getTitle());
                 if (recognition1.getConfidence() != null){
                     if (recognition1.getConfidence() >= CONSTANTS.THRESHOLD){
-                        recognition1ValueTextView.setText("Yes");
-                        //recognition1ValueTextView.setText(recognition1.getConfidence().toString());
+//                        recognition1ValueTextView.setText("Yes");
+                        recognition1ValueTextView.setText(recognition1.getConfidence().toString());
                     }
                     else{
-                        recognition1ValueTextView.setText("No");
-                        //recognition1ValueTextView.setText(recognition1.getConfidence().toString());
+//                        recognition1ValueTextView.setText("No");
+                        recognition1ValueTextView.setText(recognition1.getConfidence().toString());
                     }
                 }
             }
@@ -279,12 +283,12 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     recognition2TextView.setText(recognition2.getTitle());
                 if (recognition2.getConfidence() != null){
                     if (recognition2.getConfidence() > CONSTANTS.THRESHOLD){
-                        recognition2ValueTextView.setText("Yes");
-                        //recognition2ValueTextView.setText(recognition2.getConfidence().toString());
+//                        recognition2ValueTextView.setText("Yes");
+                        recognition2ValueTextView.setText(recognition2.getConfidence().toString());
                     }
                     else{
-                        recognition2ValueTextView.setText("No");
-                        //recognition2ValueTextView.setText(recognition2.getConfidence().toString());
+//                        recognition2ValueTextView.setText("No");
+                        recognition2ValueTextView.setText(recognition2.getConfidence().toString());
                     }
                 }
             }
@@ -295,12 +299,12 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     recognition3TextView.setText(recognition3.getTitle());
                 if (recognition3.getConfidence() != null){
                     if (recognition3.getConfidence() >= CONSTANTS.THRESHOLD){
-                        recognition3ValueTextView.setText("Yes");
-                        //recognition3ValueTextView.setText(recognition3.getConfidence().toString());
+//                        recognition3ValueTextView.setText("Yes");
+                        recognition3ValueTextView.setText(recognition3.getConfidence().toString());
                     }
                     else{
-                        recognition3ValueTextView.setText("No");
-                        //recognition3ValueTextView.setText(recognition3.getConfidence().toString());
+//                        recognition3ValueTextView.setText("No");
+                        recognition3ValueTextView.setText(recognition3.getConfidence().toString());
                     }
                 }
             }
@@ -311,12 +315,12 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     recognition4TextView.setText(recognition4.getTitle());
                 if (recognition4.getConfidence() != null){
                     if (recognition4.getConfidence() >= CONSTANTS.THRESHOLD){
-                        recognition4ValueTextView.setText("Yes");
-                        //recognition4ValueTextView.setText(recognition4.getConfidence().toString());
+//                        recognition4ValueTextView.setText("Yes");
+                        recognition4ValueTextView.setText(recognition4.getConfidence().toString());
                     }
                     else{
-                        recognition4ValueTextView.setText("No");
-                        //recognition4ValueTextView.setText(recognition4.getConfidence().toString());
+//                        recognition4ValueTextView.setText("No");
+                        recognition4ValueTextView.setText(recognition4.getConfidence().toString());
                     }
                 }
             }
