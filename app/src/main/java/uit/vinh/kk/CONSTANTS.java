@@ -6,6 +6,8 @@ import java.io.File;
 
 public final class CONSTANTS {
 
+
+
     // constants for DatabaseHelper
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "patient.db";
